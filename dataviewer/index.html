@@ -83,9 +83,8 @@
       <div class="cine-tldr">
         <div class="tldr-head"><span class="tldr-tag">TL;DR</span></div>
         <div class="tldr-body">
-          <strong>SIGMA</strong> = <u>S</u>tream · <u>I</u>npaint · <u>G</u>eometrically <u>M</u>ap <u>A</u>ggregate.
-          We remove dynamic content <em>before</em> 3D reconstruction.
-          <strong>StaDy4D</strong> is the first paired static–dynamic 4D benchmark with 18K clips, 1.9M frames, 9 cameras, diverse urban scenarios, and 4 weather presets.
+          <strong>SIGMA</strong> unbundles dynamic content from the static scene <em>before</em> 3D reconstruction, via a test-time-adapted dynamic head plus sliding-window Sim(3) chaining.
+          <strong>StaDy4D</strong> is the first paired static–dynamic 4D benchmark with 9,000 paired sequences (≈1.9M frames), 9 cameras, diverse urban scenarios, and 4 weather presets.
         </div>
       </div>
     </div>
@@ -137,8 +136,8 @@
         <div class="section-eyebrow">01 / Motivation</div>
         <h2 class="grad-h2">The 4D Reconstruction Problem</h2>
         <div class="abstract-glass">
-          <p>A full 4D scene representation demands a complete 3D model at every moment in time. In real-world data, moving objects and the static background are bundled in every frame; current feed-forward reconstructors process this bundle as-is, producing <strong>ghosting artefacts and incomplete geometry</strong>.</p>
-          <p>We introduce <strong>StaDy4D</strong>, the first large-scale paired static-dynamic 4D dataset, and <strong>SIGMA</strong>, a streaming pipeline that explicitly isolates moving regions, restores occluded backgrounds, and reconstructs clean static geometry &mdash; compatible with any off-the-shelf reconstructor.</p>
+          <p>A full 4D scene representation demands a complete 3D model at every moment in time. In real-world data, every frame bundles moving objects with the static background, and current feed-forward reconstructors process this bundle as-is, producing <strong>ghosting artefacts and incomplete geometry</strong>. Obtaining a clean 4D representation requires unbundling the two, yet no existing benchmark pairs the same scene with and without dynamic actors.</p>
+          <p>We introduce <strong>StaDy4D</strong>, the first large-scale paired static-dynamic 4D dataset, comprising <strong>9,000 paired sequences</strong> and <strong>≈1.9M frames</strong> spanning diverse urban environments, camera configurations, camera types, and weather conditions. We further propose <strong>SIGMA</strong>, which unbundles dynamic content from the static scene before 3D inference, producing clean geometry and approaching complete 4D &mdash; surpassing SOTA feed-forward baselines on pose, depth, and point-cloud metrics.</p>
         </div>
       </div>
     </section>
@@ -148,45 +147,23 @@
       <div class="content-width">
         <div class="section-eyebrow">02 / Method</div>
         <h2 class="grad-h2">SIGMA Pipeline</h2>
-        <p class="lede">Three autoregressive stages. Click each to focus.</p>
+        <p class="lede">Two stages: decouple dynamic content via test-time adaptation, then reconstruct the static (3.5+Δ)D scene with sliding-window Sim(3) chaining.</p>
 
-        <div class="overview-pipeline glass" id="pipelineRow">
-          <div class="overview-item">
-            <div class="overview-video-box">
-              <video autoplay muted loop playsinline><source src="./assets/data/dynamic_rgb.mp4" type="video/mp4"></video>
-            </div>
-            <div class="overview-label">Dynamic Input</div>
-          </div>
-          <div class="overview-arrow">→</div>
-          <button class="overview-box stage-1" data-stage="1"><div class="stage-num">STAGE 1</div><div class="stage-text">Open-Vocab<br>Segmentation</div><div class="stage-tech">DINO + SAM 2</div></button>
-          <div class="overview-arrow">→</div>
-          <button class="overview-box stage-2" data-stage="2"><div class="stage-num">STAGE 2</div><div class="stage-text">Occlusion-Aware<br>Inpainting</div><div class="stage-tech">SDXL + IP-Adapter</div></button>
-          <div class="overview-arrow">→</div>
-          <button class="overview-box stage-3" data-stage="3"><div class="stage-num">STAGE 3</div><div class="stage-text">Sliding-Window<br>Reconstruction</div><div class="stage-tech">Pi3 / VGGT + Sim(3)</div></button>
-          <div class="overview-arrow">→</div>
-          <div class="overview-item">
-            <div class="overview-video-box">
-              <img src="./assets/data/static_3d.gif" alt="4D Reconstruction">
-            </div>
-            <div class="overview-label">Clean (3.5+Δ)D</div>
-          </div>
-        </div>
+        <figure class="method-figure">
+          <img src="./assets/pipeline/method.png" alt="SIGMA pipeline overview" style="width:100%;border-radius:14px;background:#fff;">
+          <figcaption class="caption center">SIGMA realises a (3.5+Δ)D scene representation from monocular video. A test-time-adapted dynamic head segments dynamic regions; a feed-forward reconstructor with Sim(3) chaining then recovers the static and dynamic world.</figcaption>
+        </figure>
 
         <div class="method-grid">
           <div class="method-card tilt" data-card="1">
             <div class="method-step">STAGE 1</div>
-            <h3>Open-Vocabulary Dynamic Segmentation</h3>
-            <p>For each frame \(\mathbf{I}_t\), <strong>Grounding DINO</strong> localises candidate dynamic objects from a text prompt; <strong>SAM 2</strong> turns each box into a pixel-level mask. Per-frame dynamic mask <span style="white-space: nowrap;">\(\mathbf{M}_t = \bigvee_{j} \mathbf{m}_j\)</span> handles arbitrary categories without task-specific training.</p>
+            <h3>Decouple Dynamic via Test-Time Adaptation</h3>
+            <p>A dynamic head \(f_\theta\) (mirroring Pi3's confidence head) predicts a binary mask \(\hat{\mathbf{M}}_t\). At test time, \(f_\theta\) is trained with the backbone frozen on two complementary self-supervision signals: <strong>photometric pseudo-labels</strong> from reprojection residuals across temporal neighbours, and <strong>SAM\,3</strong> text-prompted masks on \(K\) keyframes. The combined FocalBCE objective recovers a clean per-frame mask \(\mathbf{M}_t\) without any human annotation.</p>
           </div>
           <div class="method-card tilt" data-card="2">
             <div class="method-step">STAGE 2</div>
-            <h3>Occlusion-Aware Background Inpainting</h3>
-            <p><strong>SDXL</strong> with an <strong>IP-Adapter</strong> conditioned on \(\mathbf{I}_t\), \(\mathbf{M}_t\), and the previous inpainted frame \(\hat{\mathbf{I}}_{t-1}\) as a style reference. The IP-Adapter promotes temporally consistent infilling by transferring appearance from the cleaned previous frame.</p>
-          </div>
-          <div class="method-card tilt" data-card="3">
-            <div class="method-step">STAGE 3</div>
             <h3>Sliding-Window Reconstruction</h3>
-            <p>Feed-forward \(\Phi\) (Pi3 / VGGT) over \(W\) most recent inpainted frames. Global scale recovered via Umeyama <strong>Sim(3)</strong> chaining on overlapping windows &mdash; reducing complexity from \(O(T^2)\) to \(O(T)\) for arbitrarily long sequences.</p>
+            <p>A frozen feed-forward reconstructor \(\Phi\) (Pi3 / VGGT) operates either offline (single forward pass) or online over overlapping windows of \(W\) frames. Each window is predicted in its own canonical, scale-normalised frame; consecutive windows are chained into a shared global scale via <strong>Umeyama Sim(3)</strong> alignment over their overlap, yielding \(O(T)\) complexity for arbitrarily long sequences.</p>
           </div>
         </div>
       </div>
@@ -245,8 +222,8 @@
               <img src="./assets/data_demo/Town03_00_cam01_drone_forward_static.gif" alt="drone view" loading="lazy">
             </div>
             <div class="world-cam">
-              <span class="world-cam-tag"><i class="fas fa-video"></i> CCTV</span>
-              <img src="./assets/data_demo/Town03_00_cam04_cctv_static.gif" alt="cctv view" loading="lazy">
+              <span class="world-cam-tag"><i class="fas fa-walking"></i> Pedestrian</span>
+              <img src="./assets/data_demo/Town03_00_cam05_pedestrian_static.gif" alt="pedestrian view" loading="lazy">
             </div>
           </div>
         </div>
@@ -335,30 +312,6 @@
         <h2 class="grad-h2">SIGMA vs Baselines</h2>
         <p class="lede center">Baselines (VGGT, Pi3) bake moving vehicles into the reconstruction as <span class="ghost-tone">ghost trails</span>. <strong>SIGMA</strong> removes these artefacts, recovering clean road surfaces and façades that closely match ground truth.</p>
 
-        <div class="pipeline-table-wrap">
-          <table class="pipeline-table fancy-pipeline">
-            <thead>
-              <tr><th>Original Frame</th><th>Dynamic Mask</th><th>Inpainted</th><th>SIGMA (Ours)</th><th>Ground Truth</th></tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><img class="lightbox-img" src="assets/pipeline/dynamic_2d.gif" alt="orig"></td>
-                <td><img class="lightbox-img" src="assets/pipeline/motion_2d.gif" alt="mask"></td>
-                <td><img class="lightbox-img" src="assets/pipeline/inpaint_2d.gif" alt="inpaint"></td>
-                <td><img class="lightbox-img" src="assets/compare/ours_recon.gif" alt="ours"></td>
-                <td><img class="lightbox-img" src="assets/pipeline/gt_2d.gif" alt="gt"></td>
-              </tr>
-              <tr>
-                <td><img class="lightbox-img" src="assets/pipeline/dynamic_3d.gif" alt="orig 3d"></td>
-                <td><div class="dash-cell">—</div></td>
-                <td><img class="lightbox-img" src="assets/compare/ours_inpaint.gif" alt="inpaint 3d"></td>
-                <td><img class="lightbox-img" src="assets/pipeline/reconstruct_3d.gif" alt="ours 3d"></td>
-                <td><img class="lightbox-img" src="assets/pipeline/gt_3d.gif" alt="gt 3d"></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
         <h3 class="sub-h3">Static Reconstruction on StaDy4D (ShortVid Test Set)</h3>
         <div class="table-wrap">
           <table class="fancy-table">
@@ -376,9 +329,18 @@
               </tr>
             </thead>
             <tbody>
-              <tr><td>VGGT</td><td><strong>100.0</strong></td><td>94.6</td><td>85.0</td><td>0.163</td><td>0.829</td><td>4.924</td><td>3.551</td><td>0.629</td></tr>
-              <tr><td>Pi3</td><td>99.9</td><td>93.6</td><td>84.7</td><td>0.157</td><td>0.867</td><td>3.885</td><td>3.342</td><td>0.495</td></tr>
-              <tr class="ours-row"><td><strong>SIGMA</strong></td><td>99.9</td><td><strong>95.6</strong></td><td><strong>88.8</strong></td><td><strong>0.090</strong></td><td><strong>0.916</strong></td><td><strong>3.007</strong></td><td><strong>2.326</strong></td><td><strong>0.777</strong></td></tr>
+              <tr><td>MonST3R</td><td><u>99.9</u></td><td>91.4</td><td>79.6</td><td>0.206</td><td>0.766</td><td>23.208</td><td>5.838</td><td>0.687</td></tr>
+              <tr><td>Easi3R</td><td><u>99.9</u></td><td>90.2</td><td>73.9</td><td>0.208</td><td>0.768</td><td>4.006</td><td>5.643</td><td>0.678</td></tr>
+              <tr><td>VGGT4D</td><td><strong>100.0</strong></td><td>95.0</td><td>87.1</td><td>0.168</td><td>0.832</td><td>4.452</td><td>3.843</td><td>0.758</td></tr>
+              <tr><td>St4RTrack</td><td>98.5</td><td>74.9</td><td>60.9</td><td>0.280</td><td>0.628</td><td>4.806</td><td>8.253</td><td>0.621</td></tr>
+              <tr><td>CUT3R</td><td><strong>100.0</strong></td><td>94.4</td><td>82.3</td><td>0.202</td><td>0.783</td><td>3.334</td><td>4.963</td><td>0.677</td></tr>
+              <tr><td>TTT3R</td><td><u>99.9</u></td><td>93.7</td><td>81.5</td><td>0.198</td><td>0.788</td><td>4.125</td><td>4.815</td><td>0.693</td></tr>
+              <tr><td>LoGeR</td><td><strong>100.0</strong></td><td>95.2</td><td>84.9</td><td>0.166</td><td>0.843</td><td><u>2.733</u></td><td>4.182</td><td>0.726</td></tr>
+              <tr><td>VGGT</td><td><strong>100.0</strong></td><td>95.1</td><td>87.2</td><td>0.168</td><td>0.832</td><td>4.511</td><td>3.987</td><td>0.629</td></tr>
+              <tr><td>MapAnything</td><td><strong>100.0</strong></td><td>93.1</td><td>80.1</td><td>0.174</td><td>0.844</td><td>2.945</td><td>3.331</td><td>0.751</td></tr>
+              <tr><td>DA3</td><td><strong>100.0</strong></td><td><strong>96.8</strong></td><td><strong>91.2</strong></td><td>0.168</td><td>0.851</td><td>3.413</td><td><u>3.151</u></td><td><u>0.786</u></td></tr>
+              <tr><td>Pi3</td><td><u>99.9</u></td><td>93.6</td><td>84.7</td><td><u>0.157</u></td><td><u>0.867</u></td><td>3.885</td><td>3.342</td><td>0.495</td></tr>
+              <tr class="ours-row"><td><strong>SIGMA</strong></td><td><strong>100.0</strong></td><td><u>96.7</u></td><td><u>90.7</u></td><td><strong>0.093</strong></td><td><strong>0.924</strong></td><td><strong>2.360</strong></td><td><strong>1.539</strong></td><td><strong>0.789</strong></td></tr>
             </tbody>
           </table>
         </div>
