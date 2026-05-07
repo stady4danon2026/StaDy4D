@@ -1027,9 +1027,28 @@ section { padding: var(--space-xxl) 0; position: relative; }
 
 /* ============== GALLERY ============== */
 .gallery-town-tabs {
-  display: flex; flex-wrap: wrap; justify-content: center;
-  gap: 8px;
+  display: flex; flex-direction: column;
+  gap: 10px;
   margin-bottom: var(--space-md);
+}
+.gallery-town-row {
+  display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
+  gap: 8px;
+}
+.split-pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  padding: 4px 10px;
+  border-radius: 100px;
+  background: rgba(34, 197, 94, 0.15);
+  color: #16a34a;
+  font-weight: 700;
+  margin-right: 6px;
+}
+.split-pill-test {
+  background: rgba(217, 119, 6, 0.15);
+  color: var(--accent-warm);
 }
 .gallery-town-tab {
   padding: 8px 16px;
@@ -1259,6 +1278,35 @@ kbd {
   padding: 4px;
   box-shadow: var(--shadow-md);
   position: relative;
+}
+
+/* ============== RECON PAIR HEADER ============== */
+.recon-pair-header {
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+  margin: 8px 0 14px;
+}
+.recon-arrow {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 1rem;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: all 0.2s ease;
+}
+.recon-arrow:hover { background: var(--primary); color: #fff; border-color: var(--primary); transform: translateY(-1px); }
+.recon-pair-label {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  min-width: 280px;
+}
+.recon-pair-name { font-weight: 600; font-size: 0.95rem; }
+.recon-pair-counter {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--text-mute);
+  letter-spacing: 0.08em;
 }
 
 /* ============== RECON QUAD (Interactive 3D) ============== */

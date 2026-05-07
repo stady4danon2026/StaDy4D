@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Σ StaDy4D: Towards Complete 4D Static-Dynamic Reconstruction with SIGMA</title>
+  <title>StaDy4D: Towards Complete 4D Static-Dynamic Reconstruction with SIGMA</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%236d28d9'/><text x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Georgia,serif' font-size='44' font-weight='700' fill='white'>%CE%A3</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,8 +32,8 @@
   <nav class="side-nav" id="sideNav" aria-label="Section navigation">
     <a href="#top"        data-num="00"><span class="sn-dot"></span><span class="sn-label">Top</span></a>
     <a href="#motivation" data-num="01"><span class="sn-dot"></span><span class="sn-label">Motivation</span></a>
-    <a href="#method"     data-num="02"><span class="sn-dot"></span><span class="sn-label">Method</span></a>
-    <a href="#dataset"    data-num="03"><span class="sn-dot"></span><span class="sn-label">Dataset</span></a>
+    <a href="#dataset"    data-num="02"><span class="sn-dot"></span><span class="sn-label">Dataset</span></a>
+    <a href="#method"     data-num="03"><span class="sn-dot"></span><span class="sn-label">Method</span></a>
     <a href="#explore"    data-num="04"><span class="sn-dot"></span><span class="sn-label">Explore</span></a>
     <a href="#scale"      data-num="05"><span class="sn-dot"></span><span class="sn-label">Scale</span></a>
     <a href="#results"    data-num="06"><span class="sn-dot"></span><span class="sn-label">Results</span></a>
@@ -124,7 +124,6 @@
           <div class="stat-label">Duration Splits</div>
         </div>
       </div>
-      <p class="hint">Click any number to replay the count animation.</p>
     </div>
   </section>
 
@@ -142,37 +141,10 @@
       </div>
     </section>
 
-    <!-- ============== METHOD OVERVIEW ============== -->
-    <section class="reveal" id="method">
-      <div class="content-width">
-        <div class="section-eyebrow">02 / Method</div>
-        <h2 class="grad-h2">SIGMA Pipeline</h2>
-        <p class="lede">Two stages: decouple dynamic content via test-time adaptation, then reconstruct the static (3.5+Δ)D scene with sliding-window Sim(3) chaining.</p>
-
-        <figure class="method-figure">
-          <img src="./assets/pipeline/method.png" alt="SIGMA pipeline overview" style="width:100%;border-radius:14px;background:#fff;">
-          <figcaption class="caption center">SIGMA realises a (3.5+Δ)D scene representation from monocular video. A test-time-adapted dynamic head segments dynamic regions; a feed-forward reconstructor with Sim(3) chaining then recovers the static and dynamic world.</figcaption>
-        </figure>
-
-        <div class="method-grid">
-          <div class="method-card tilt" data-card="1">
-            <div class="method-step">STAGE 1</div>
-            <h3>Decouple Dynamic via Test-Time Adaptation</h3>
-            <p>A dynamic head \(f_\theta\) (mirroring Pi3's confidence head) predicts a binary mask \(\hat{\mathbf{M}}_t\). At test time, \(f_\theta\) is trained with the backbone frozen on two complementary self-supervision signals: <strong>photometric pseudo-labels</strong> from reprojection residuals across temporal neighbours, and <strong>SAM\,3</strong> text-prompted masks on \(K\) keyframes. The combined FocalBCE objective recovers a clean per-frame mask \(\mathbf{M}_t\) without any human annotation.</p>
-          </div>
-          <div class="method-card tilt" data-card="2">
-            <div class="method-step">STAGE 2</div>
-            <h3>Sliding-Window Reconstruction</h3>
-            <p>A frozen feed-forward reconstructor \(\Phi\) (Pi3 / VGGT) operates either offline (single forward pass) or online over overlapping windows of \(W\) frames. Each window is predicted in its own canonical, scale-normalised frame; consecutive windows are chained into a shared global scale via <strong>Umeyama Sim(3)</strong> alignment over their overlap, yielding \(O(T)\) complexity for arbitrarily long sequences.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- ============== STADY4D HERO BLOCK ============== -->
     <section class="reveal dataset-hero" id="dataset">
       <div class="content-width">
-        <div class="section-eyebrow">03 / Dataset</div>
+        <div class="section-eyebrow">02 / Dataset</div>
         <h2 class="grad-h2 mega">Meet <span class="brand-stady">StaDy4D</span></h2>
         <p class="lede center">The first paired <strong class="static-tone">Static</strong>–<strong class="dynamic-tone">Dynamic</strong> 4D benchmark. Every scripted trajectory is replayed twice under <em>pixel-identical</em> camera poses, weather, and lighting.</p>
 
@@ -258,22 +230,55 @@
       </div>
     </section>
 
+    <!-- ============== METHOD OVERVIEW ============== -->
+    <section class="reveal" id="method">
+      <div class="content-width">
+        <div class="section-eyebrow">03 / Method</div>
+        <h2 class="grad-h2">SIGMA Pipeline</h2>
+        <p class="lede">Two stages: decouple dynamic content via test-time adaptation, then reconstruct the static (3.5+Δ)D scene with sliding-window Sim(3) chaining.</p>
+
+        <figure class="method-figure">
+          <img src="./assets/pipeline/method.png" alt="SIGMA pipeline overview" style="width:100%;border-radius:14px;background:#fff;">
+          <figcaption class="caption center">SIGMA realises a (3.5+Δ)D scene representation from monocular video. A test-time-adapted dynamic head segments dynamic regions; a feed-forward reconstructor with Sim(3) chaining then recovers the static and dynamic world.</figcaption>
+        </figure>
+
+        <div class="method-grid">
+          <div class="method-card tilt" data-card="1">
+            <div class="method-step">STAGE 1</div>
+            <h3>Decouple Dynamic via Test-Time Adaptation</h3>
+            <p>A dynamic head \(f_\theta\) (mirroring Pi3's confidence head) predicts a binary mask \(\hat{\mathbf{M}}_t\). At test time, \(f_\theta\) is trained with the backbone frozen on two complementary self-supervision signals: <strong>photometric pseudo-labels</strong> from reprojection residuals across temporal neighbours, and <strong>SAM\,3</strong> text-prompted masks on \(K\) keyframes. The combined FocalBCE objective recovers a clean per-frame mask \(\mathbf{M}_t\) without any human annotation.</p>
+          </div>
+          <div class="method-card tilt" data-card="2">
+            <div class="method-step">STAGE 2</div>
+            <h3>Sliding-Window Reconstruction</h3>
+            <p>A frozen feed-forward reconstructor \(\Phi\) (Pi3 / VGGT) operates either offline (single forward pass) or online over overlapping windows of \(W\) frames. Each window is predicted in its own canonical, scale-normalised frame; consecutive windows are chained into a shared global scale via <strong>Umeyama Sim(3)</strong> alignment over their overlap, yielding \(O(T)\) complexity for arbitrarily long sequences.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ============== INTERACTIVE GALLERY ============== -->
     <section class="reveal" id="explore">
       <div class="content-width">
         <div class="section-eyebrow">04 / Explore</div>
         <h2 class="grad-h2">Interactive Dataset Browser</h2>
-        <p class="lede center">Pick a scenario &amp; camera archetype. Sliders auto-sweep — drag to take control, or click a tile to expand.</p>
+        <p class="lede center">Pick a city map &amp; camera archetype. Sliders auto-sweep — drag to take control, or click a tile to expand.</p>
 
         <div class="gallery-town-tabs" id="town-tabs">
-          <button class="gallery-town-tab active" data-town="Town01">Scenario 01<span class="train-pill">train</span></button>
-          <button class="gallery-town-tab" data-town="Town02">Scenario 02<span class="train-pill">train</span></button>
-          <button class="gallery-town-tab" data-town="Town03">Scenario 03<span class="test-pill">test</span></button>
-          <button class="gallery-town-tab" data-town="Town04">Scenario 04<span class="train-pill">train</span></button>
-          <button class="gallery-town-tab" data-town="Town05">Scenario 05<span class="train-pill">train</span></button>
-          <button class="gallery-town-tab" data-town="Town06">Scenario 06<span class="train-pill">train</span></button>
-          <button class="gallery-town-tab" data-town="Town07">Scenario 07<span class="test-pill">test</span></button>
-          <button class="gallery-town-tab" data-town="Town10HD">Scenario 08<span class="test-pill">test</span></button>
+          <div class="gallery-town-row" data-split="train">
+            <span class="split-pill">TRAIN</span>
+            <button class="gallery-town-tab active" data-town="Town01">City Map 01</button>
+            <button class="gallery-town-tab" data-town="Town02">City Map 02</button>
+            <button class="gallery-town-tab" data-town="Town04">City Map 04</button>
+            <button class="gallery-town-tab" data-town="Town05">City Map 05</button>
+            <button class="gallery-town-tab" data-town="Town06">City Map 06</button>
+          </div>
+          <div class="gallery-town-row" data-split="test">
+            <span class="split-pill split-pill-test">TEST</span>
+            <button class="gallery-town-tab" data-town="Town03">City Map 03</button>
+            <button class="gallery-town-tab" data-town="Town07">City Map 07</button>
+            <button class="gallery-town-tab" data-town="Town10HD">City Map 10</button>
+          </div>
         </div>
 
         <div class="gallery-container">
@@ -390,10 +395,22 @@
         </div>
 
         <h3 class="sub-h3">Interactive 3D Reconstruction</h3>
-        <div class="recon-quad">
+        <div class="recon-pair-header">
+          <button class="recon-arrow" id="reconPrev" aria-label="Previous pair"><i class="fas fa-chevron-left"></i></button>
+          <div class="recon-pair-label">
+            <span class="recon-pair-name" id="reconPairName">City Map 06 · cam_01 (car forward)</span>
+            <span class="recon-pair-counter" id="reconPairCounter">1 / 2</span>
+          </div>
+          <button class="recon-arrow" id="reconNext" aria-label="Next pair"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        <div class="recon-quad" id="reconQuad"
+             data-pairs='[
+               {"name":"City Map 06 · cam_01 (car forward)","sigma":"./assets/reconstruct/sigma_output_b.glb","dynGlb":"./assets/reconstruct/dynamic_gt_b.glb","dynVid":"./assets/reconstruct/dynamic_rgb_b.mp4","staVid":"./assets/reconstruct/static_rgb_b.mp4"},
+               {"name":"City Map 01 · cam_01 (car forward)","sigma":"./assets/reconstruct/sigma_output.glb","dynGlb":"./assets/reconstruct/dynamic_gt.glb","dynVid":"./assets/reconstruct/dynamic_rgb.mp4","staVid":"./assets/reconstruct/static_rgb.mp4"}
+             ]'>
           <div class="recon-quad-left model-card">
             <div class="recon-tag"><i class="fas fa-cube"></i> SIGMA output (static, 4D-clean)</div>
-            <model-viewer src="./assets/reconstruct/sigma_output.glb"
+            <model-viewer id="reconSigma" src="./assets/reconstruct/sigma_output_b.glb"
                           alt="SIGMA static reconstruction"
                           camera-controls auto-rotate autoplay
                           shadow-intensity="1" exposure="1.1"
@@ -404,16 +421,16 @@
             <div class="recon-quad-videos">
               <div class="recon-quad-video model-card">
                 <div class="recon-tag dynamic-tone"><i class="fas fa-play-circle"></i> Dynamic input</div>
-                <video autoplay muted loop playsinline><source src="./assets/reconstruct/dynamic_rgb.mp4" type="video/mp4"></video>
+                <video id="reconDynVid" autoplay muted loop playsinline><source src="./assets/reconstruct/dynamic_rgb_b.mp4" type="video/mp4"></video>
               </div>
               <div class="recon-quad-video model-card">
                 <div class="recon-tag static-tone"><i class="fas fa-play-circle"></i> Static reference</div>
-                <video autoplay muted loop playsinline><source src="./assets/reconstruct/static_rgb.mp4" type="video/mp4"></video>
+                <video id="reconStaVid" autoplay muted loop playsinline><source src="./assets/reconstruct/static_rgb_b.mp4" type="video/mp4"></video>
               </div>
             </div>
             <div class="recon-quad-glb model-card">
               <div class="recon-tag"><i class="fas fa-cube"></i> Dynamic ground truth (per-frame fusion)</div>
-              <model-viewer src="./assets/reconstruct/dynamic_gt.glb"
+              <model-viewer id="reconDynGlb" src="./assets/reconstruct/dynamic_gt_b.glb"
                             alt="Dynamic GT GLB"
                             camera-controls auto-rotate autoplay
                             shadow-intensity="1" exposure="1.1"
@@ -422,7 +439,34 @@
             </div>
           </div>
         </div>
-        <p class="caption center">Left: SIGMA's clean static reconstruction. Right top: paired dynamic / static RGB inputs. Right bottom: ground-truth dynamic point cloud. Drag any panel to orbit, scroll to zoom.</p>
+        <p class="caption center">Left: SIGMA's clean static reconstruction. Right top: paired dynamic / static RGB inputs. Right bottom: ground-truth dynamic point cloud. Drag any panel to orbit, scroll to zoom &mdash; click ◀ ▶ to swap pairs.</p>
+        <script>
+          (function () {
+            const root = document.getElementById('reconQuad');
+            if (!root) return;
+            const pairs = JSON.parse(root.dataset.pairs);
+            let idx = 0;
+            const sigma = document.getElementById('reconSigma');
+            const dynGlb = document.getElementById('reconDynGlb');
+            const dynVid = document.getElementById('reconDynVid');
+            const staVid = document.getElementById('reconStaVid');
+            const nameEl = document.getElementById('reconPairName');
+            const counterEl = document.getElementById('reconPairCounter');
+            function setPair(i) {
+              idx = (i + pairs.length) % pairs.length;
+              const p = pairs[idx];
+              sigma.src = p.sigma;
+              dynGlb.src = p.dynGlb;
+              dynVid.querySelector('source').src = p.dynVid;
+              staVid.querySelector('source').src = p.staVid;
+              dynVid.load(); staVid.load();
+              nameEl.textContent = p.name;
+              counterEl.textContent = (idx + 1) + ' / ' + pairs.length;
+            }
+            document.getElementById('reconPrev').addEventListener('click', () => setPair(idx - 1));
+            document.getElementById('reconNext').addEventListener('click', () => setPair(idx + 1));
+          })();
+        </script>
       </div>
     </section>
 
