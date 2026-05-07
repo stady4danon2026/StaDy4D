@@ -390,18 +390,39 @@
         </div>
 
         <h3 class="sub-h3">Interactive 3D Reconstruction</h3>
-        <div class="model-card">
-          <model-viewer src="./assets/reconstruct/ours_scene.glb"
-                        alt="SIGMA static reconstruction"
-                        camera-controls
-                        auto-rotate
-                        autoplay
-                        shadow-intensity="1"
-                        exposure="1.1"
-                        style="width:100%;height:560px;border-radius:18px;">
-          </model-viewer>
-          <p class="caption center">Drag to orbit · scroll to zoom · the moving vehicles have been removed before fusion.</p>
+        <div class="recon-quad">
+          <div class="recon-quad-left model-card">
+            <div class="recon-tag"><i class="fas fa-cube"></i> SIGMA output (static, 4D-clean)</div>
+            <model-viewer src="./assets/reconstruct/sigma_output.glb"
+                          alt="SIGMA static reconstruction"
+                          camera-controls auto-rotate autoplay
+                          shadow-intensity="1" exposure="1.1"
+                          style="width:100%;height:100%;min-height:560px;border-radius:14px;">
+            </model-viewer>
+          </div>
+          <div class="recon-quad-right">
+            <div class="recon-quad-videos">
+              <div class="recon-quad-video model-card">
+                <div class="recon-tag dynamic-tone"><i class="fas fa-play-circle"></i> Dynamic input</div>
+                <video autoplay muted loop playsinline><source src="./assets/reconstruct/dynamic_rgb.mp4" type="video/mp4"></video>
+              </div>
+              <div class="recon-quad-video model-card">
+                <div class="recon-tag static-tone"><i class="fas fa-play-circle"></i> Static reference</div>
+                <video autoplay muted loop playsinline><source src="./assets/reconstruct/static_rgb.mp4" type="video/mp4"></video>
+              </div>
+            </div>
+            <div class="recon-quad-glb model-card">
+              <div class="recon-tag"><i class="fas fa-cube"></i> Dynamic ground truth (per-frame fusion)</div>
+              <model-viewer src="./assets/reconstruct/dynamic_gt.glb"
+                            alt="Dynamic GT GLB"
+                            camera-controls auto-rotate autoplay
+                            shadow-intensity="1" exposure="1.1"
+                            style="width:100%;height:100%;min-height:240px;border-radius:14px;">
+              </model-viewer>
+            </div>
+          </div>
         </div>
+        <p class="caption center">Left: SIGMA's clean static reconstruction. Right top: paired dynamic / static RGB inputs. Right bottom: ground-truth dynamic point cloud. Drag any panel to orbit, scroll to zoom.</p>
       </div>
     </section>
 

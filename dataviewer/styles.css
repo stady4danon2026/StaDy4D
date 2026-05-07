@@ -1213,9 +1213,11 @@ kbd {
   display: flex; gap: 8px;
   animation: scrollLeft 60s linear infinite;
   position: relative;
+  z-index: 1;
 }
 .scroll-row:nth-child(even) { animation: scrollRight 70s linear infinite; }
-.scroll-row:hover { animation-play-state: paused; }
+.scroll-row:hover { animation-play-state: paused; z-index: 50; }
+.scroll-row:has(.scroll-row-item:hover) { z-index: 50; }
 .scroll-row-item {
   flex-shrink: 0;
   width: 240px; height: 135px;
@@ -1256,6 +1258,56 @@ kbd {
   background: var(--surface);
   padding: 4px;
   box-shadow: var(--shadow-md);
+  position: relative;
+}
+
+/* ============== RECON QUAD (Interactive 3D) ============== */
+.recon-quad {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 12px;
+  align-items: stretch;
+  min-height: 560px;
+}
+.recon-quad-left { display: flex; }
+.recon-quad-left model-viewer { flex: 1; }
+.recon-quad-right {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 12px;
+  min-height: 560px;
+}
+.recon-quad-videos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  min-height: 0;
+}
+.recon-quad-video { display: flex; align-items: stretch; }
+.recon-quad-video video {
+  width: 100%; height: 100%; object-fit: cover;
+  border-radius: 14px; display: block;
+}
+.recon-quad-glb { display: flex; }
+.recon-quad-glb model-viewer { flex: 1; }
+.recon-tag {
+  position: absolute; top: 10px; left: 10px;
+  padding: 4px 10px;
+  background: rgba(15,15,30,0.75);
+  color: #fff;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  z-index: 5;
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+}
+.recon-tag i { margin-right: 5px; }
+@media (max-width: 880px) {
+  .recon-quad { grid-template-columns: 1fr; min-height: 0; }
+  .recon-quad-right { min-height: 0; }
+  .recon-quad-left model-viewer { min-height: 360px; }
 }
 model-viewer {
   background: var(--bg-2) !important;
