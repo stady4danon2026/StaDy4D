@@ -1,0 +1,9 @@
+# @package hydra.job_logging
+# Custom Hydra job logging config that disables Hydra's logging setup
+# This allows our custom Rich logging to take over
+version: 1
+disable_existing_loggers: false
+formatters: {}
+handlers: {}
+root:
+  handlers: []

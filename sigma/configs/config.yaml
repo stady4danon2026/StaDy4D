@@ -1,0 +1,26 @@
+defaults:
+  - data: dataset
+  - pipeline/preprocess: grounded_sam
+  - pipeline/motion: grounded_sam
+  - pipeline/inpainting: sdxl_lightning # sdxl_lightning blank
+  - pipeline/reconstruction: pi3 # pi3 vggt_online
+  - logging: default
+  - visualization: stages
+  - _self_
+
+device: cuda
+
+run:
+  name: default_run  # Descriptive name for this experiment run
+  timestamp: ${now:%m%d_%H%M}  # Compact timestamp: YYYYMMDD_HHMMSS
+  output_dir: outputs/${run.name}/${run.timestamp}  # Main output directory for this run
+  visualization_dir: ${run.output_dir}  # Output directory (flat structure)
+  save_every_n_frames: 5
+  demo_video: demo/data/sample.mp4
+  test_modules: []
+  mock_inputs: {}
+
+hydra:
+  output_subdir: .hydra
+  run:
+    dir: ${run.output_dir}

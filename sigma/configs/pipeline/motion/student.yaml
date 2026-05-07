@@ -1,0 +1,9 @@
+motion:
+  name: student
+  implementation: sigma.pipeline.motion.student.StudentMotionEstimator
+  checkpoint: checkpoints/student_unet.pt
+  device: ${device}
+  img_size: 320
+  threshold: 0.5
+  min_blob_area: 64
+  visualization: true

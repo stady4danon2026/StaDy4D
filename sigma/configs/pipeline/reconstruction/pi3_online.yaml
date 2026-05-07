@@ -1,0 +1,14 @@
+name: pi3_online
+implementation: sigma.pipeline.reconstruction.pi3_adapter.Pi3OnlineReconstructor
+checkpoint: yyfz233/Pi3X          # HuggingFace model ID; swap to "yyfz233/Pi3" for the lighter variant
+min_confidence: 0.1               # sigmoid-confidence threshold for point filtering
+device: ${device}
+max_frames: 10                    # sliding-window size (current + N-1 previous frames; 10-15 recommended)
+exclude_moving_objects: true      # zero depth/conf inside the segmentation mask
+pixel_limit: 255000               # max H×W fed to Pi3X (controls internal resize)
+use_origin_frames: true           # feed Pi3X original frames (with car) for 4D depth separation
+calibrate_poses: true            # not used in online mode (windows already small)
+pose_window_size: 5               # kept for config parity; has no effect in online mode
+fill_masked_depth: true           # back-project the aggregated global static cloud to fill mask-region depth
+mask_dilate_px: 3                 # dilate mask by N pixels before fill to clean silhouette bleed
+fill_confidence: 0.5              # confidence written to filled pixels

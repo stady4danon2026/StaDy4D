@@ -1,0 +1,32 @@
+name: sdxl_lightning
+implementation: sigma.pipeline.inpainting.sdxl_lightning.SDXLLightningInpainter
+
+# SDXL-Lightning inference steps (must be 2, 4, or 8)
+# - 2-step: Fastest, good quality (recommended for real-time)
+# - 4-step: Balanced speed and quality (recommended default)
+# - 8-step: Best quality, still much faster than standard SDXL (30+ steps)
+num_inference_steps: 8
+
+# IP-Adapter configuration
+enable_ip_adapter: true
+ip_adapter_scale: 0.4  # Strength of reference image conditioning (0.0-1.0)
+
+# Prompts
+prompt: "empty street, empty scene, background texture, high quality, realistic, seamless integration, no objects"
+negative_prompt: "objects, humans, animals, foreground elements, text, watermark, artifacts, low quality, distorted, blur, ugly, seams, bad anatomy"
+
+# Device configuration
+device: cuda  # "cuda" or "cpu"
+enable_model_cpu_offload: true
+
+# Visualization
+visualization: true
+
+# IP-Adapter Plus configuration for SDXL
+ip_adapter_config:
+  # IP-Adapter Plus uses patch embeddings for stronger reference control
+  repo: "h94/IP-Adapter"
+  subfolder: "sdxl_models"
+  weight_name: "ip-adapter-plus_sdxl_vit-h.bin"
+  image_encoder_repo: "h94/IP-Adapter"
+  image_encoder_subfolder: "models/image_encoder"

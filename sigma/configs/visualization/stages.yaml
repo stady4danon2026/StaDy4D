@@ -1,0 +1,8 @@
+save_images: true
+save_gifs: false
+save_videos: true
+save_ply: false
+stages:
+  motion: outputs/motion1
+  inpainting: outputs/inpainting
+  reconstruction: outputs/reconstruction

@@ -1,0 +1,7 @@
+name: geometric
+implementation: sigma.pipeline.motion.geometric.GeometricMotionEstimator
+ransac_iters: 2000
+confidence_threshold: 0.9
+device: ${device}
+visualization: true
+top_percent: 0.1

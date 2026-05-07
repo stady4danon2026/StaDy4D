@@ -1,0 +1,6 @@
+name: megasam
+implementation: sigma.pipeline.reconstruction.megasam_adapter.MegaSAMReconstructor
+checkpoint: megasam-large
+min_confidence: 0.35
+device: ${device}
+visualization: true

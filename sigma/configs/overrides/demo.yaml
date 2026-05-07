@@ -1,0 +1,6 @@
+defaults:
+  - override /data: dataset
+
+run:
+  demo_video: demo/data/sample.mp4
+  save_every_n_frames: 10

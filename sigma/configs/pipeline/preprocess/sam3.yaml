@@ -1,0 +1,6 @@
+name: sam3
+implementation: sigma.pipeline.preprocess.sam3.SAM3Preprocessor
+prompt: "person. car. bus. truck. bike."
+confidence_threshold: 0.5
+model_id: "facebook/sam3"
+device: "cuda"

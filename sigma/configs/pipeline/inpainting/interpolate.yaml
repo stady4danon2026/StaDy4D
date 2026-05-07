@@ -1,0 +1,4 @@
+name: interpolate
+implementation: sigma.pipeline.inpainting.interpolate.InterpolateInpainter
+method: telea     # "telea" (fast marching) or "ns" (Navier-Stokes)
+radius: 5         # Inpainting neighborhood radius in pixels

@@ -1,0 +1,8 @@
+motion:
+  name: learned
+  implementation: sigma.pipeline.motion.learned.LearnedMotionEstimator
+  backbone: sam2
+  mask_model: gmm
+  confidence_threshold: 0.8
+  device: ${device}
+  visualization: true

@@ -1,0 +1,23 @@
+name: sam3_ttt_union
+implementation: sigma.pipeline.motion.sam3_ttt.Sam3TttUnionMotionEstimator
+head_checkpoint: checkpoints/pi3_dyn_head_pooled.pt
+pi3_checkpoint: yyfz233/Pi3X
+sam3_checkpoint: facebook/sam3
+device: ${device}
+text: "car. truck. bus. motorcycle. bicycle. pedestrian."
+score_thr: 0.3
+keyframes: 5
+ttt_steps: 30
+ttt_lr: 5.0e-4
+ttt_batch_frames: 4
+head_threshold: 0.45
+head_morph_close: 5
+head_morph_dilate: 3
+head_min_blob: 100
+max_coverage: 0.50
+head_cov_max_for_union: 1.0
+pixel_limit: 255000
+do_ttt: true
+do_head: true
+do_sam3: true
+visualization: true

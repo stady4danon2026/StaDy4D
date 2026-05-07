@@ -1,0 +1,16 @@
+name: sdxl_lightning_uncond
+implementation: sigma.pipeline.inpainting.sdxl_lightning.SDXLLightningInpainter
+
+num_inference_steps: 8
+
+# No IP-Adapter — unconditional inpainting (text-prompt only)
+enable_ip_adapter: false
+ip_adapter_scale: 0.0
+
+prompt: "empty street, empty scene, background texture, high quality, realistic, seamless integration, no objects"
+negative_prompt: "objects, humans, car, animals, foreground elements, text, watermark, artifacts, low quality, distorted, blur, ugly, seams, bad anatomy"
+
+device: cuda
+enable_model_cpu_offload: true
+
+visualization: true

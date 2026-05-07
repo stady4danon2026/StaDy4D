@@ -1,0 +1,27 @@
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.eggs/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+.venv/
+.env
+
+# Outputs / data / weights
+outputs/
+checkpoints/
+StaDy4D/
+*.ply
+*.npy
+*.safetensors
+*.mp4
+*.gif
+*.png
+
+# IDE
+.vscode/
+.idea/

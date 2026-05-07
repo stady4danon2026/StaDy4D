@@ -1,0 +1,6 @@
+name: dust3r
+implementation: sigma.pipeline.reconstruction.dust3r_adapter.DUSt3RReconstructor
+checkpoint: dust3r-xs
+min_confidence: 0.3
+device: ${device}
+visualization: true

@@ -1,0 +1,30 @@
+# Core
+torch>=2.0
+torchvision>=0.15
+numpy
+opencv-python
+imageio
+imageio-ffmpeg
+Pillow
+scipy
+safetensors
+pandas
+matplotlib
+tqdm
+
+# Hydra / OmegaConf for stage configs
+hydra-core
+omegaconf
+
+# HuggingFace ecosystem (Pi3X + SAM3)
+transformers>=4.45
+huggingface_hub
+diffusers
+
+# Optional baselines
+# groundingdino-py
+# segment-anything
+# rerun-sdk
+# trimesh
+
+# Pi3X model — install upstream or place under third_party/

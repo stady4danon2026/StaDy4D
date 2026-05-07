@@ -1,0 +1,20 @@
+name: learned
+implementation: sigma.pipeline.inpainting.learned.LearnedInpainter
+model_name: diffusers/stable-diffusion-xl-1.0-inpainting-0.1
+enable_ip_adapter: true
+ip_adapter_scale: 0.4
+prompt: "empty scene, background texture, high quality, realistic, seamless integration, no objects"
+negative_prompt: "objects, humans, animals, foreground elements, text, watermark, artifacts, low quality, distorted, blur, ugly, seams, bad anatomy"
+device: cuda  # Device to use: "cuda" or "cpu"
+enable_model_cpu_offload: false
+visualization: true
+
+# IP-Adapter Configuration
+ip_adapter_config:
+  # For SDXL Standard: repo="h94/IP-Adapter", subfolder="sdxl_models", weight_name="ip-adapter_sdxl.bin"
+  # For SDXL Plus: repo="h94/IP-Adapter", subfolder="sdxl_models", weight_name="ip-adapter-plus_sdxl_vit-h.bin", image_encoder_repo="h94/IP-Adapter", image_encoder_subfolder="models/image_encoder"
+  repo: "h94/IP-Adapter"
+  subfolder: "sdxl_models"
+  weight_name: "ip-adapter-plus_sdxl_vit-h.bin"
+  image_encoder_repo: "h94/IP-Adapter"
+  image_encoder_subfolder: "models/image_encoder"

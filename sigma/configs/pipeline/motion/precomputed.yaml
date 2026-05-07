@@ -1,0 +1,8 @@
+name: precomputed
+implementation: sigma.pipeline.motion.precomputed.PrecomputedMaskMotionEstimator
+mask_root: <DATA_ROOT>/sigma_outputs/sam3_only
+scene: ${data.scene}
+camera: ${data.camera}
+morph_dilate: 0
+threshold: 127
+visualization: true

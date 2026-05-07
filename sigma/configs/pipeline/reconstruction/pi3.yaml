@@ -1,0 +1,15 @@
+name: pi3
+implementation: sigma.pipeline.reconstruction.pi3_adapter.Pi3Reconstructor
+checkpoint: yyfz233/Pi3X          # HuggingFace model ID; swap to "yyfz233/Pi3" for the lighter variant
+min_confidence: 0.1               # sigmoid-confidence threshold for point filtering
+device: ${device}
+max_frames: 50                    # max frames batched into Pi3X in one call
+exclude_moving_objects: true      # zero depth/conf inside the segmentation mask
+pixel_limit: 255000               # max H×W fed to Pi3X (controls internal resize)
+use_origin_frames: false           # feed Pi3X original frames (with car) for 4D depth separation
+calibrate_poses: false             # sliding-window Sim(3) pose calibration (fixes forward-motion scale)
+pose_window_size: 5               # frames per calibration window (smaller = more local accuracy)
+finalize_batch_size: null          # null = all frames at once; set e.g. 10 for chunked processing to avoid OOM
+fill_masked_depth: false           # back-project the aggregated global static cloud to fill mask-region depth
+mask_dilate_px: 3                  # dilate mask by N pixels before fill to clean silhouette bleed
+fill_confidence: 0.5               # confidence written to filled pixels (downweights vs direct observations)

@@ -1,0 +1,11 @@
+name: stady4d_sequence
+root_dir: StaDy4D
+duration: short          # "short" or "mid"
+split: test              # "test", "train", etc.
+scene: scene_T03_008     # Scene directory name
+frames_dir: ${data.root_dir}/${data.duration}/${data.split}/${data.scene}
+frame_stride: 1
+max_frames: 100
+data_format: dynamic     # "dynamic" or "static"
+camera: cam_00_car_forward  # Camera sub-directory under data_format/
+load_metadata: true

@@ -1,0 +1,5 @@
+name: geometric
+implementation: sigma.pipeline.inpainting.geometric.GeometricInpainter
+patch_size: 9
+blending: poisson
+visualization: true

@@ -1,0 +1,21 @@
+name: grounded_sam
+implementation: sigma.pipeline.preprocess.grounded_sam.GroundedSAMPreprocessor
+
+# Grounding DINO
+grounding_dino_model: "IDEA-Research/grounding-dino-base"
+box_threshold: 0.25
+text_threshold: 0.2
+prompt: "person. car. bus. scooter. motorcycle. train. tram. truck. taxi. boat. ship. bike."
+
+use_rectangular_mask: true # If true, use the bounding box of the detected objects as the mask
+margin_left: 0.15    # Left margin as percentage of bbox width (only used when use_rectangular_mask is true)
+margin_right: 0.15   # Right margin as percentage of bbox width (only used when use_rectangular_mask is true)
+margin_top: 0.15     # Top margin as percentage of bbox height (only used when use_rectangular_mask is true)
+margin_bottom: 0.3  # Bottom margin as percentage of bbox height (only used when use_rectangular_mask is true)
+
+# SAM 2
+# SAM 2
+sam2_checkpoint: "facebook/sam2.1-hiera-tiny"
+# sam2_config: "sam2_hiera_l.yaml" # Not needed for HF pipeline
+
+device: "cuda"

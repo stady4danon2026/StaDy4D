@@ -1,0 +1,6 @@
+level: INFO
+save_dir: ${run.output_dir}/logs  # Save logs in the run folder
+writer: tensorboard
+wandb:
+  enabled: false
+  project: sigma

@@ -1,0 +1,15 @@
+name: pi3_dyn
+implementation: sigma.pipeline.motion.pi3_dyn.Pi3DynMotionEstimator
+checkpoint: checkpoints/pi3_dyn_head.pt
+pi3_checkpoint: yyfz233/Pi3X
+device: ${device}
+threshold: 0.5
+pixel_limit: 255000
+ttt_steps: 200
+ttt_lr: 1.0e-3
+ttt_batch_frames: 8
+photometric_threshold: 0.10
+photometric_consensus: 3
+photometric_neighbors: [-3, -1, 1, 3]
+min_blob_area: 64
+visualization: true

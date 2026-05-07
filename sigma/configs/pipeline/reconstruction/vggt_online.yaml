@@ -1,0 +1,7 @@
+name: vggt_online
+implementation: sigma.pipeline.reconstruction.vggt_adapter.VGGTOnlineReconstructor
+checkpoint: facebook/VGGT-1B
+min_confidence: 0.4
+device: ${device}
+max_frames: 10 # Maximum number of frames to use (current + t-1 + t-2 if exists)
+visualization: true
