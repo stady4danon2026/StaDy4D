@@ -1,0 +1,70 @@
+{
+  "description": "Large Scale Production - All maps, many videos",
+
+  "carla": {
+    "host": "localhost",
+    "port": 2000,
+    "timeout": 10.0
+  },
+
+  "maps": [
+    "Town01",
+    "Town02",
+    "Town03",
+    "Town04",
+    "Town05",
+    "Town06",
+    "Town07",
+    "Town10HD"
+  ],
+
+  "video_generation": {
+    "videos_per_map": 9,
+    "video_duration_sec": 10,
+    "fps": 10,
+    "trajectory_types": []
+  },
+
+  "multi_camera_types": [
+    "car_forward",
+    "car_forward",
+    "car_forward",
+    "drone_forward",
+    "orbit_building",
+    "orbit_crossroad",
+    "cctv",
+    "pedestrian",
+    "pedestrian"
+  ],
+
+  "camera": {
+    "width": 640,
+    "height": 480,
+    "fov": 70
+  },
+
+  "actors": {
+    "n_vehicles": 80,
+    "n_walkers": 50
+  },
+
+  "weather": ["ClearNoon", "HardRainNoon", "ClearNoon", "MidRainSunset", "ClearNoon", "WetCloudyNoon"],
+
+  "output": {
+    "base_dir": "StaDy4D/MidVid",
+    "create_videos": true,
+    "save_rgb": true,
+    "save_depth": true,
+    "save_depth_vis": true,
+    "save_extrinsics": true
+  },
+
+  "random_seed": 43,
+
+  "execution": {
+    "skip_existing": true,
+    "resume_from_map": null,
+    "resume_from_video": null,
+    "disable_resume": false
+  }
+}
