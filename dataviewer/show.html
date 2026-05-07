@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StaDy4D Gallery - Visualization Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0a0a0f;
+      --bg-card: #12121a;
+      --border: #2a2a3a;
+      --text: #e0e0e0;
+      --text-muted: #888;
+      --accent: #6366f1;
+      --accent-glow: rgba(99, 102, 241, 0.3);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-muted);
+      margin-bottom: 3rem;
+    }
+
+    /* Navigation */
+    .nav {
+      position: sticky;
+      top: 0;
+      background: rgba(10, 10, 15, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      padding: 1rem 0;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-links {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .nav-links a {
+      color: var(--text);
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+
+    .nav-links a:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* Section styles */
+    section {
+      margin-bottom: 6rem;
+      padding: 2rem;
+      background: var(--bg-card);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+    }
+
+    section h2 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+      color: var(--accent);
+    }
+
+    section .desc {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+
+    /* Filter controls */
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      padding: 1rem;
+      background: rgba(0,0,0,0.3);
+      border-radius: 12px;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .filter-group label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    select {
+      background: var(--bg-dark);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    /* ============================================
+       STYLE 1: Dense Grid with Hover Zoom
+       ============================================ */
+    .grid-zoom {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 4px;
+    }
+
+    .grid-zoom-item {
+      position: relative;
+      aspect-ratio: 16/9;
+      overflow: hidden;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: transform 0.3s ease, z-index 0s;
+    }
+
+    .grid-zoom-item:hover {
+      transform: scale(2.5);
+      z-index: 50;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+    }
+
+    .grid-zoom-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .grid-zoom-item .label {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0,0,0,0.8);
+      padding: 2px 4px;
+      font-size: 8px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .grid-zoom-item:hover .label {
+      opacity: 1;
+      font-size: 10px;
+    }
+
+    /* ============================================
+       STYLE 2: Flip Cards (Static/Dynamic toggle)
+       ============================================ */
+    .flip-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .flip-card {
+      perspective: 1000px;
+      height: 180px;
+    }
+
+    .flip-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+    }
+
+    .flip-card:hover .flip-card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .flip-card-front, .flip-card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .flip-card-front {
+      background: var(--bg-dark);
+    }
+
+    .flip-card-back {
+      background: var(--bg-dark);
+      transform: rotateY(180deg);
+    }
+
+    .flip-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .flip-card .card-label {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: rgba(0,0,0,0.7);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .flip-card-front .card-label { background: rgba(239, 68, 68, 0.8); }
+    .flip-card-back .card-label { background: rgba(34, 197, 94, 0.8); }
+
+    /* ============================================
+       STYLE 3: Magnifier Glass Effect
+       ============================================ */
+    .magnifier-container {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 8px;
+    }
+
+    .magnifier-item {
+      aspect-ratio: 16/9;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: crosshair;
+    }
+
+    .magnifier-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    #magnifier-lens {
+      position: fixed;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      border: 3px solid var(--accent);
+      box-shadow: 0 0 30px var(--accent-glow);
+      pointer-events: none;
+      display: none;
+      z-index: 1000;
+      background-repeat: no-repeat;
+      background-size: 600px 337px;
+    }
+
+    /* ============================================
+       STYLE 4: Masonry/Pinterest Layout
+       ============================================ */
+    .masonry {
+      column-count: 6;
+      column-gap: 12px;
+    }
+
+    @media (max-width: 1400px) { .masonry { column-count: 5; } }
+    @media (max-width: 1100px) { .masonry { column-count: 4; } }
+    @media (max-width: 800px) { .masonry { column-count: 3; } }
+
+    .masonry-item {
+      break-inside: avoid;
+      margin-bottom: 12px;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .masonry-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(99, 102, 241, 0.2);
+    }
+
+    .masonry-item img {
+      width: 100%;
+      display: block;
+    }
+
+    .masonry-item .overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(transparent, rgba(0,0,0,0.9));
+      padding: 2rem 1rem 1rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .masonry-item:hover .overlay {
+      opacity: 1;
+    }
+
+    .masonry-item .overlay span {
+      font-size: 0.8rem;
+    }
+
+    /* ============================================
+       STYLE 5: Side-by-Side Comparison Slider
+       ============================================ */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+      gap: 2rem;
+    }
+
+    .comparison-container {
+      position: relative;
+      aspect-ratio: 16/9;
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: ew-resize;
+    }
+
+    .comparison-container img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .comparison-container .img-dynamic {
+      clip-path: inset(0 50% 0 0);
+    }
+
+    .comparison-container .slider-line {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 4px;
+      background: white;
+      transform: translateX(-50%);
+      z-index: 10;
+    }
+
+    .comparison-container .slider-handle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 40px;
+      height: 40px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #000;
+      z-index: 11;
+    }
+
+    .comparison-label {
+      position: absolute;
+      bottom: 10px;
+      padding: 4px 12px;
+      background: rgba(0,0,0,0.7);
+      border-radius: 4px;
+      font-size: 12px;
+      z-index: 5;
+    }
+
+    .comparison-label.left { left: 10px; }
+    .comparison-label.right { right: 10px; }
+
+    /* ============================================
+       STYLE 6: Lightbox Gallery
+       ============================================ */
+    .lightbox-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 10px;
+    }
+
+    .lightbox-item {
+      aspect-ratio: 16/9;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.2s;
+    }
+
+    .lightbox-item:hover {
+      transform: scale(1.03);
+    }
+
+    .lightbox-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .lightbox-item::after {
+      content: '+';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 3rem;
+      color: white;
+      opacity: 0;
+      transition: opacity 0.3s;
+      text-shadow: 0 0 20px rgba(0,0,0,0.8);
+    }
+
+    .lightbox-item:hover::after {
+      opacity: 1;
+    }
+
+    /* Lightbox modal */
+    .lightbox-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.95);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .lightbox-modal.active {
+      display: flex;
+    }
+
+    .lightbox-modal img {
+      max-width: 90vw;
+      max-height: 80vh;
+      border-radius: 12px;
+    }
+
+    .lightbox-modal .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 3rem;
+      color: white;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.3s;
+    }
+
+    .lightbox-modal .close-btn:hover {
+      opacity: 1;
+    }
+
+    .lightbox-modal .nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 3rem;
+      color: white;
+      cursor: pointer;
+      padding: 1rem;
+      opacity: 0.7;
+      transition: opacity 0.3s;
+    }
+
+    .lightbox-modal .nav-btn:hover { opacity: 1; }
+    .lightbox-modal .nav-btn.prev { left: 20px; }
+    .lightbox-modal .nav-btn.next { right: 20px; }
+
+    .lightbox-info {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    /* ============================================
+       STYLE 7: Interactive Bubble Cloud
+       ============================================ */
+    .bubble-container {
+      position: relative;
+      height: 800px;
+      overflow: hidden;
+      border-radius: 16px;
+      background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a0f 100%);
+    }
+
+    .bubble {
+      position: absolute;
+      border-radius: 50%;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                  width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                  height 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                  z-index 0s;
+      box-shadow: 0 5px 30px rgba(0,0,0,0.5);
+    }
+
+    .bubble:hover {
+      transform: scale(1.8) !important;
+      z-index: 100;
+    }
+
+    .bubble img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* ============================================
+       STYLE 8: Infinite Scroll Wall
+       ============================================ */
+    .scroll-wall {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow: hidden;
+    }
+
+    .scroll-row {
+      display: flex;
+      gap: 4px;
+      animation: scrollLeft 60s linear infinite;
+    }
+
+    .scroll-row:nth-child(even) {
+      animation: scrollRight 60s linear infinite;
+    }
+
+    .scroll-row-item {
+      flex-shrink: 0;
+      width: 200px;
+      height: 112px;
+      border-radius: 8px;
+      overflow: hidden;
+      transition: transform 0.3s;
+    }
+
+    .scroll-row-item:hover {
+      transform: scale(1.5);
+      z-index: 10;
+    }
+
+    .scroll-row-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    @keyframes scrollLeft {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    @keyframes scrollRight {
+      0% { transform: translateX(-50%); }
+      100% { transform: translateX(0); }
+    }
+
+    /* ============================================
+       STYLE 9: Hover Reveal Grid
+       ============================================ */
+    .reveal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+
+    .reveal-card {
+      position: relative;
+      aspect-ratio: 16/9;
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .reveal-card img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity 0.5s ease;
+    }
+
+    .reveal-card .static-img {
+      z-index: 1;
+    }
+
+    .reveal-card .dynamic-img {
+      z-index: 2;
+      opacity: 1;
+    }
+
+    .reveal-card:hover .dynamic-img {
+      opacity: 0;
+    }
+
+    .reveal-card .tag {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 10;
+      background: rgba(0,0,0,0.7);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      transition: background 0.3s;
+    }
+
+    .reveal-card:hover .tag {
+      background: rgba(34, 197, 94, 0.8);
+    }
+
+    .reveal-card:not(:hover) .tag {
+      background: rgba(239, 68, 68, 0.8);
+    }
+
+    /* ============================================
+       STYLE 10: Town-based Tabs
+       ============================================ */
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .tab-btn {
+      padding: 0.6rem 1.2rem;
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .tab-btn:hover, .tab-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .tab-item {
+      aspect-ratio: 16/9;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .tab-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Loading state */
+    .loading {
+      text-align: center;
+      padding: 4rem;
+      color: var(--text-muted);
+    }
+
+    .loading::after {
+      content: '';
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-left: 1rem;
+      vertical-align: middle;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>StaDy4D Gallery</h1>
+    <p class="subtitle">Multiple visualization methods for the paired Static/Dynamic GIF dataset</p>
+  </div>
+
+  <nav class="nav">
+    <div class="nav-links">
+      <a href="#grid-zoom">Dense Grid + Zoom</a>
+      <a href="#flip-cards">Flip Cards</a>
+      <a href="#magnifier">Magnifier</a>
+      <a href="#masonry">Masonry</a>
+      <a href="#comparison">Comparison Slider</a>
+      <a href="#lightbox">Lightbox</a>
+      <a href="#bubbles">Bubble Cloud</a>
+      <a href="#scroll-wall">Scroll Wall</a>
+      <a href="#reveal">Hover Reveal</a>
+      <a href="#tabs">Town Tabs</a>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <!-- STYLE 1: Dense Grid with Hover Zoom -->
+    <section id="grid-zoom">
+      <h2>1. Dense Grid with Hover Zoom</h2>
+      <p class="desc">A compact 10+ column grid. Hover over any thumbnail to zoom in 2.5x with smooth animation.</p>
+      <div class="filters">
+        <div class="filter-group">
+          <label>Type:</label>
+          <select id="grid-type-filter">
+            <option value="all">All</option>
+            <option value="dynamic">Dynamic Only</option>
+            <option value="static">Static Only</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Camera:</label>
+          <select id="grid-cam-filter">
+            <option value="all">All Cameras</option>
+            <option value="car_forward">Car Forward</option>
+            <option value="drone_forward">Drone Forward</option>
+            <option value="orbit_building">Orbit Building</option>
+            <option value="orbit_crossroad">Orbit Crossroad</option>
+            <option value="cctv">CCTV</option>
+            <option value="pedestrian">Pedestrian</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-zoom" id="grid-zoom-container">
+        <div class="loading">Loading images...</div>
+      </div>
+    </section>
+
+    <!-- STYLE 2: Flip Cards -->
+    <section id="flip-cards">
+      <h2>2. Flip Cards</h2>
+      <p class="desc">Cards showing Dynamic view by default. Hover to flip and reveal the Static version.</p>
+      <div class="flip-grid" id="flip-grid-container">
+        <div class="loading">Loading images...</div>
+      </div>
+    </section>
+
+    <!-- STYLE 3: Magnifier Glass -->
+    <section id="magnifier">
+      <h2>3. Magnifier Glass</h2>
+      <p class="desc">Move your mouse over images to see a magnified circular lens following your cursor.</p>
+      <div class="magnifier-container" id="magnifier-container">
+        <div class="loading">Loading images...</div>
+      </div>
+      <div id="magnifier-lens"></div>
+    </section>
+
+    <!-- STYLE 4: Masonry Layout -->
+    <section id="masonry">
+      <h2>4. Masonry / Pinterest Layout</h2>
+      <p class="desc">Staggered grid layout with hover effects showing metadata overlay.</p>
+      <div class="masonry" id="masonry-container">
+        <div class="loading">Loading images...</div>
+      </div>
+    </section>
+
+    <!-- STYLE 5: Comparison Slider -->
+    <section id="comparison">
+      <h2>5. Side-by-Side Comparison Slider</h2>
+      <p class="desc">Drag the slider to compare Dynamic vs Static versions of each scene.</p>
+      <div class="comparison-grid" id="comparison-container">
+        <div class="loading">Loading images...</div>
+      </div>
+    </section>
+
+    <!-- STYLE 6: Lightbox Gallery -->
+    <section id="lightbox">
+      <h2>6. Lightbox Gallery</h2>
+      <p class="desc">Click any thumbnail to open full-size view with navigation arrows.</p>
+      <div class="lightbox-grid" id="lightbox-container">
+        <div class="loading">Loading images...</div>
+      </div>
+    </section>
+
+    <!-- STYLE 7: Bubble Cloud -->
+    <section id="bubbles">
+      <h2>7. Interactive Bubble Cloud</h2>
+      <p class="desc">Floating circular thumbnails. Hover to enlarge. Creates an organic, exploratory feel.</p>
+      <div class="bubble-container" id="bubble-container">
+        <div class="loading">Loading images...</div>
+      </div>
+    </section>
+
+    <!-- STYLE 8: Infinite Scroll Wall -->
+    <section id="scroll-wall">
+      <h2>8. Auto-Scrolling Wall</h2>
+      <p class="desc">Continuously scrolling rows in alternating directions. Hover to pause and zoom.</p>
+      <div class="scroll-wall" id="scroll-wall-container">
+        <div class="loading">Loading images...</div>
+      </div>
+    </section>
+
+    <!-- STYLE 9: Hover Reveal -->
+    <section id="reveal">
+      <h2>9. Hover Reveal</h2>
+      <p class="desc">Shows Dynamic by default. Hover to reveal the Static underneath with a fade transition.</p>
+      <div class="reveal-grid" id="reveal-container">
+        <div class="loading">Loading images...</div>
+      </div>
+    </section>
+
+    <!-- STYLE 10: Town Tabs -->
+    <section id="tabs">
+      <h2>10. Town-based Tabs</h2>
+      <p class="desc">Organized by CARLA town. Click tabs to filter by location.</p>
+      <div class="tabs" id="town-tabs"></div>
+      <div id="town-content"></div>
+    </section>
+
+  </div>
+
+  <!-- Lightbox Modal -->
+  <div class="lightbox-modal" id="lightbox-modal">
+    <span class="close-btn" onclick="closeLightbox()">&times;</span>
+    <span class="nav-btn prev" onclick="prevLightbox()">&#10094;</span>
+    <span class="nav-btn next" onclick="nextLightbox()">&#10095;</span>
+    <img id="lightbox-img" src="" alt="">
+    <div class="lightbox-info" id="lightbox-info"></div>
+  </div>
+
+  <script>
+    // GIF file data - we'll generate this list
+    const towns = ['Town01', 'Town02', 'Town03', 'Town04', 'Town05', 'Town06', 'Town07', 'Town10HD'];
+    const scenes = ['00', '01', '02', '03', '04', '05'];
+    const cameras = [
+      { id: 'cam00', name: 'car_forward', label: 'Car Forward' },
+      { id: 'cam01', name: 'drone_forward', label: 'Drone Forward' },
+      { id: 'cam02', name: 'orbit_building', label: 'Orbit Building' },
+      { id: 'cam03', name: 'orbit_crossroad', label: 'Orbit Crossroad' },
+      { id: 'cam04', name: 'cctv', label: 'CCTV' },
+      { id: 'cam05', name: 'pedestrian', label: 'Pedestrian' }
+    ];
+
+    // Generate all GIF pairs
+    const gifPairs = [];
+    towns.forEach(town => {
+      scenes.forEach(scene => {
+        cameras.forEach(cam => {
+          const base = `${town}_${scene}_${cam.id}_${cam.name}`;
+          gifPairs.push({
+            town,
+            scene,
+            camera: cam.name,
+            cameraLabel: cam.label,
+            dynamic: `assets/data_demo/${base}_dynamic.gif`,
+            static: `assets/data_demo/${base}_static.gif`,
+            label: `${town} Scene ${scene} - ${cam.label}`
+          });
+        });
+      });
+    });
+
+    // Limit for performance (use subset for demos)
+    const DEMO_LIMIT = 72; // Show first 72 pairs (12 per town sample)
+    const demoPairs = gifPairs.slice(0, DEMO_LIMIT);
+
+    // ============================================
+    // STYLE 1: Dense Grid with Hover Zoom
+    // ============================================
+    function initGridZoom() {
+      const container = document.getElementById('grid-zoom-container');
+      container.innerHTML = '';
+
+      demoPairs.forEach(pair => {
+        const div = document.createElement('div');
+        div.className = 'grid-zoom-item';
+        div.dataset.type = 'dynamic';
+        div.dataset.camera = pair.camera;
+        div.innerHTML = `
+          <img src="${pair.dynamic}" alt="${pair.label}" loading="lazy">
+          <div class="label">${pair.label}</div>
+        `;
+        container.appendChild(div);
+      });
+
+      // Filters
+      document.getElementById('grid-type-filter').addEventListener('change', filterGrid);
+      document.getElementById('grid-cam-filter').addEventListener('change', filterGrid);
+    }
+
+    function filterGrid() {
+      const typeFilter = document.getElementById('grid-type-filter').value;
+      const camFilter = document.getElementById('grid-cam-filter').value;
+      const container = document.getElementById('grid-zoom-container');
+
+      container.innerHTML = '';
+
+      demoPairs.forEach(pair => {
+        if (camFilter !== 'all' && pair.camera !== camFilter) return;
+
+        if (typeFilter === 'all' || typeFilter === 'dynamic') {
+          const div = document.createElement('div');
+          div.className = 'grid-zoom-item';
+          div.innerHTML = `
+            <img src="${pair.dynamic}" alt="${pair.label} Dynamic" loading="lazy">
+            <div class="label">${pair.label} (Dynamic)</div>
+          `;
+          container.appendChild(div);
+        }
+
+        if (typeFilter === 'all' || typeFilter === 'static') {
+          const div = document.createElement('div');
+          div.className = 'grid-zoom-item';
+          div.innerHTML = `
+            <img src="${pair.static}" alt="${pair.label} Static" loading="lazy">
+            <div class="label">${pair.label} (Static)</div>
+          `;
+          container.appendChild(div);
+        }
+      });
+    }
+
+    // ============================================
+    // STYLE 2: Flip Cards
+    // ============================================
+    function initFlipCards() {
+      const container = document.getElementById('flip-grid-container');
+      container.innerHTML = '';
+
+      demoPairs.slice(0, 24).forEach(pair => {
+        const card = document.createElement('div');
+        card.className = 'flip-card';
+        card.innerHTML = `
+          <div class="flip-card-inner">
+            <div class="flip-card-front">
+              <img src="${pair.dynamic}" alt="Dynamic" loading="lazy">
+              <span class="card-label">Dynamic</span>
+            </div>
+            <div class="flip-card-back">
+              <img src="${pair.static}" alt="Static" loading="lazy">
+              <span class="card-label">Static</span>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // ============================================
+    // STYLE 3: Magnifier
+    // ============================================
+    function initMagnifier() {
+      const container = document.getElementById('magnifier-container');
+      const lens = document.getElementById('magnifier-lens');
+      container.innerHTML = '';
+
+      demoPairs.slice(0, 36).forEach(pair => {
+        const div = document.createElement('div');
+        div.className = 'magnifier-item';
+        div.innerHTML = `<img src="${pair.dynamic}" alt="${pair.label}" loading="lazy">`;
+
+        div.addEventListener('mousemove', (e) => {
+          const img = div.querySelector('img');
+          const rect = div.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const percentX = x / rect.width;
+          const percentY = y / rect.height;
+
+          lens.style.display = 'block';
+          lens.style.left = (e.clientX - 150) + 'px';
+          lens.style.top = (e.clientY - 150) + 'px';
+          lens.style.backgroundImage = `url(${img.src})`;
+          lens.style.backgroundPosition = `${percentX * 100}% ${percentY * 100}%`;
+        });
+
+        div.addEventListener('mouseleave', () => {
+          lens.style.display = 'none';
+        });
+
+        container.appendChild(div);
+      });
+    }
+
+    // ============================================
+    // STYLE 4: Masonry
+    // ============================================
+    function initMasonry() {
+      const container = document.getElementById('masonry-container');
+      container.innerHTML = '';
+
+      demoPairs.slice(0, 48).forEach(pair => {
+        const div = document.createElement('div');
+        div.className = 'masonry-item';
+        div.innerHTML = `
+          <img src="${pair.dynamic}" alt="${pair.label}" loading="lazy">
+          <div class="overlay">
+            <span>${pair.label}</span>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    // ============================================
+    // STYLE 5: Comparison Slider
+    // ============================================
+    function initComparison() {
+      const container = document.getElementById('comparison-container');
+      container.innerHTML = '';
+
+      demoPairs.slice(0, 12).forEach((pair, idx) => {
+        const div = document.createElement('div');
+        div.className = 'comparison-container';
+        div.innerHTML = `
+          <img class="img-static" src="${pair.static}" alt="Static" loading="lazy">
+          <img class="img-dynamic" src="${pair.dynamic}" alt="Dynamic" loading="lazy">
+          <div class="slider-line"></div>
+          <div class="slider-handle">&#8596;</div>
+          <span class="comparison-label left">Dynamic</span>
+          <span class="comparison-label right">Static</span>
+        `;
+
+        div.addEventListener('mousemove', (e) => {
+          const rect = div.getBoundingClientRect();
+          const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+          const percent = (x / rect.width) * 100;
+
+          div.querySelector('.img-dynamic').style.clipPath = `inset(0 ${100 - percent}% 0 0)`;
+          div.querySelector('.slider-line').style.left = percent + '%';
+          div.querySelector('.slider-handle').style.left = percent + '%';
+        });
+
+        container.appendChild(div);
+      });
+    }
+
+    // ============================================
+    // STYLE 6: Lightbox
+    // ============================================
+    let lightboxImages = [];
+    let currentLightboxIndex = 0;
+
+    function initLightbox() {
+      const container = document.getElementById('lightbox-container');
+      container.innerHTML = '';
+      lightboxImages = [];
+
+      demoPairs.slice(0, 48).forEach((pair, idx) => {
+        lightboxImages.push({ src: pair.dynamic, label: pair.label + ' (Dynamic)' });
+        lightboxImages.push({ src: pair.static, label: pair.label + ' (Static)' });
+
+        const div = document.createElement('div');
+        div.className = 'lightbox-item';
+        div.innerHTML = `<img src="${pair.dynamic}" alt="${pair.label}" loading="lazy">`;
+        div.onclick = () => openLightbox(idx * 2);
+        container.appendChild(div);
+      });
+    }
+
+    function openLightbox(index) {
+      currentLightboxIndex = index;
+      const modal = document.getElementById('lightbox-modal');
+      const img = document.getElementById('lightbox-img');
+      const info = document.getElementById('lightbox-info');
+
+      img.src = lightboxImages[index].src;
+      info.textContent = lightboxImages[index].label;
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox-modal').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function prevLightbox() {
+      currentLightboxIndex = (currentLightboxIndex - 1 + lightboxImages.length) % lightboxImages.length;
+      document.getElementById('lightbox-img').src = lightboxImages[currentLightboxIndex].src;
+      document.getElementById('lightbox-info').textContent = lightboxImages[currentLightboxIndex].label;
+    }
+
+    function nextLightbox() {
+      currentLightboxIndex = (currentLightboxIndex + 1) % lightboxImages.length;
+      document.getElementById('lightbox-img').src = lightboxImages[currentLightboxIndex].src;
+      document.getElementById('lightbox-info').textContent = lightboxImages[currentLightboxIndex].label;
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (!document.getElementById('lightbox-modal').classList.contains('active')) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') prevLightbox();
+      if (e.key === 'ArrowRight') nextLightbox();
+    });
+
+    // ============================================
+    // STYLE 7: Bubble Cloud
+    // ============================================
+    function initBubbles() {
+      const container = document.getElementById('bubble-container');
+      container.innerHTML = '';
+
+      const subset = demoPairs.slice(0, 40);
+      subset.forEach((pair, idx) => {
+        const size = 60 + Math.random() * 80;
+        const x = Math.random() * (container.offsetWidth - size);
+        const y = Math.random() * (container.offsetHeight - size);
+
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.style.width = size + 'px';
+        bubble.style.height = size + 'px';
+        bubble.style.left = x + 'px';
+        bubble.style.top = y + 'px';
+        bubble.innerHTML = `<img src="${pair.dynamic}" alt="${pair.label}" loading="lazy">`;
+        container.appendChild(bubble);
+      });
+    }
+
+    // ============================================
+    // STYLE 8: Scroll Wall
+    // ============================================
+    function initScrollWall() {
+      const container = document.getElementById('scroll-wall-container');
+      container.innerHTML = '';
+
+      const rows = 5;
+      const itemsPerRow = 20;
+
+      for (let r = 0; r < rows; r++) {
+        const row = document.createElement('div');
+        row.className = 'scroll-row';
+
+        // Duplicate items for seamless loop
+        for (let i = 0; i < itemsPerRow * 2; i++) {
+          const pair = demoPairs[i % demoPairs.length];
+          const item = document.createElement('div');
+          item.className = 'scroll-row-item';
+          item.innerHTML = `<img src="${r % 2 === 0 ? pair.dynamic : pair.static}" alt="${pair.label}" loading="lazy">`;
+          row.appendChild(item);
+        }
+
+        container.appendChild(row);
+      }
+    }
+
+    // ============================================
+    // STYLE 9: Hover Reveal
+    // ============================================
+    function initReveal() {
+      const container = document.getElementById('reveal-container');
+      container.innerHTML = '';
+
+      demoPairs.slice(0, 24).forEach(pair => {
+        const card = document.createElement('div');
+        card.className = 'reveal-card';
+        card.innerHTML = `
+          <img class="static-img" src="${pair.static}" alt="Static" loading="lazy">
+          <img class="dynamic-img" src="${pair.dynamic}" alt="Dynamic" loading="lazy">
+          <span class="tag">Dynamic</span>
+        `;
+
+        card.addEventListener('mouseenter', () => {
+          card.querySelector('.tag').textContent = 'Static';
+        });
+        card.addEventListener('mouseleave', () => {
+          card.querySelector('.tag').textContent = 'Dynamic';
+        });
+
+        container.appendChild(card);
+      });
+    }
+
+    // ============================================
+    // STYLE 10: Town Tabs
+    // ============================================
+    function initTabs() {
+      const tabsContainer = document.getElementById('town-tabs');
+      const contentContainer = document.getElementById('town-content');
+
+      tabsContainer.innerHTML = '';
+      contentContainer.innerHTML = '';
+
+      towns.forEach((town, idx) => {
+        // Create tab button
+        const btn = document.createElement('button');
+        btn.className = 'tab-btn' + (idx === 0 ? ' active' : '');
+        btn.textContent = town;
+        btn.onclick = () => {
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          btn.classList.add('active');
+          document.getElementById(`tab-${town}`).classList.add('active');
+        };
+        tabsContainer.appendChild(btn);
+
+        // Create tab content
+        const content = document.createElement('div');
+        content.className = 'tab-content' + (idx === 0 ? ' active' : '');
+        content.id = `tab-${town}`;
+
+        const townPairs = gifPairs.filter(p => p.town === town).slice(0, 12);
+        townPairs.forEach(pair => {
+          const item = document.createElement('div');
+          item.className = 'tab-item';
+          item.innerHTML = `<img src="${pair.dynamic}" alt="${pair.label}" loading="lazy">`;
+          content.appendChild(item);
+        });
+
+        contentContainer.appendChild(content);
+      });
+    }
+
+    // Initialize all galleries
+    document.addEventListener('DOMContentLoaded', () => {
+      initGridZoom();
+      initFlipCards();
+      initMagnifier();
+      initMasonry();
+      initComparison();
+      initLightbox();
+      initBubbles();
+      initScrollWall();
+      initReveal();
+      initTabs();
+    });
+  </script>
+</body>
+</html>

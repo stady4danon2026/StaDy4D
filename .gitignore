@@ -22,6 +22,9 @@ StaDy4D/
 *.gif
 *.png
 
+# Allow supplementary site assets
+!dataviewer/**
+
 # IDE
 .vscode/
 .idea/

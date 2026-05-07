@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Σ StaDy4D: Towards Complete 4D Static-Dynamic Reconstruction with SIGMA</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%236d28d9'/><text x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Georgia,serif' font-size='44' font-weight='700' fill='white'>%CE%A3</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <script defer id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "three":           "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/":   "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+
+  <!-- Floating theme toggle -->
+  <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme" title="Toggle light / dark (T)">
+    <i class="fas fa-moon"></i>
+  </button>
+
+  <!-- Sticky section nav -->
+  <nav class="side-nav" id="sideNav" aria-label="Section navigation">
+    <a href="#top"        data-num="00"><span class="sn-dot"></span><span class="sn-label">Top</span></a>
+    <a href="#motivation" data-num="01"><span class="sn-dot"></span><span class="sn-label">Motivation</span></a>
+    <a href="#method"     data-num="02"><span class="sn-dot"></span><span class="sn-label">Method</span></a>
+    <a href="#dataset"    data-num="03"><span class="sn-dot"></span><span class="sn-label">Dataset</span></a>
+    <a href="#explore"    data-num="04"><span class="sn-dot"></span><span class="sn-label">Explore</span></a>
+    <a href="#scale"      data-num="05"><span class="sn-dot"></span><span class="sn-label">Scale</span></a>
+    <a href="#results"    data-num="06"><span class="sn-dot"></span><span class="sn-label">Results</span></a>
+    <a href="#bibtex"     data-num="07"><span class="sn-dot"></span><span class="sn-label">Cite</span></a>
+  </nav>
+
+  <!-- ============== CINEMATIC HERO ============== -->
+  <header class="cine-hero" id="top">
+    <div class="cine-bg">
+      <img class="cine-video cine-video-static is-active" src="./assets/hero/static.gif" alt="Static scene preview">
+      <img class="cine-video cine-video-dynamic" src="./assets/hero/dynamic.gif" alt="Dynamic scene preview">
+      <div class="cine-grid"></div>
+      <div class="cine-vignette"></div>
+    </div>
+
+    <!-- Click-to-toggle mode badge -->
+    <button class="cine-mode-badge" id="modeBadge" title="Click to switch view">
+      <span class="dot"></span>
+      <span id="modeText">STATIC</span>
+      <span class="cine-mode-sub">click to switch</span>
+    </button>
+
+    <div class="cine-content">
+      <div class="conf-pill">Anonymous Submission · Under Review</div>
+
+      <h1 class="cine-title">
+        <span class="sigma-glyph">Σ</span> <span class="title-main">StaDy4D</span>
+      </h1>
+      <h2 class="cine-subtitle">
+        Towards Complete 4D Static-Dynamic Reconstruction with <strong>SIGMA</strong>
+      </h2>
+
+      <div class="cine-authors">
+        <span>Anonymous Authors</span>
+      </div>
+      <div class="cine-affil">
+        <span>Under double-blind review &mdash; NeurIPS 2026 Datasets &amp; Benchmarks</span>
+      </div>
+
+      <div class="cine-cta">
+        <a href="#" class="cta cta-primary"><i class="fas fa-file-pdf"></i> Paper (anonymized)</a>
+        <a href="#" class="cta"><i class="fas fa-database"></i> Dataset (link withheld)</a>
+        <a href="#" class="cta"><i class="fab fa-github"></i> Code (anonymized)</a>
+        <a href="#bibtex" class="cta"><i class="fas fa-quote-right"></i> BibTeX</a>
+      </div>
+
+      <div class="cine-tldr">
+        <div class="tldr-head"><span class="tldr-tag">TL;DR</span></div>
+        <div class="tldr-body">
+          <strong>SIGMA</strong> = <u>S</u>tream · <u>I</u>npaint · <u>G</u>eometrically <u>M</u>ap <u>A</u>ggregate.
+          We remove dynamic content <em>before</em> 3D reconstruction.
+          <strong>StaDy4D</strong> is the first paired static–dynamic 4D benchmark with 18K clips, 1.9M frames, 9 cameras, diverse urban scenarios, and 4 weather presets.
+        </div>
+      </div>
+    </div>
+
+    <div class="cine-scroll">
+      <span>scroll to explore</span>
+      <i class="fas fa-chevron-down"></i>
+    </div>
+  </header>
+
+  <!-- ============== HEADLINE STATS ============== -->
+  <section class="stats-band">
+    <div class="content-width">
+      <div class="stats-grid">
+        <div class="stat-card tilt" tabindex="0">
+          <div class="stat-num" data-count="18000" data-suffix="K" data-divisor="1000">0</div>
+          <div class="stat-label">Video Streams</div>
+        </div>
+        <div class="stat-card tilt" tabindex="0">
+          <div class="stat-num" data-count="1900000" data-suffix="M" data-divisor="1000000" data-decimals="1">0</div>
+          <div class="stat-label">Annotated Frames</div>
+        </div>
+        <div class="stat-card tilt" tabindex="0">
+          <div class="stat-num" data-count="9" data-suffix="">0</div>
+          <div class="stat-label">Camera Configs</div>
+        </div>
+        <div class="stat-card tilt" tabindex="0">
+          <div class="stat-num" data-count="8" data-suffix="">0</div>
+          <div class="stat-label">Urban Scenarios</div>
+        </div>
+        <div class="stat-card tilt" tabindex="0">
+          <div class="stat-num" data-count="4" data-suffix="">0</div>
+          <div class="stat-label">Weather Presets</div>
+        </div>
+        <div class="stat-card tilt" tabindex="0">
+          <div class="stat-num" data-count="3" data-suffix="">0</div>
+          <div class="stat-label">Duration Splits</div>
+        </div>
+      </div>
+      <p class="hint">Click any number to replay the count animation.</p>
+    </div>
+  </section>
+
+  <div class="container">
+
+    <!-- ============== ABSTRACT ============== -->
+    <section class="reveal" id="motivation">
+      <div class="content-width">
+        <div class="section-eyebrow">01 / Motivation</div>
+        <h2 class="grad-h2">The 4D Reconstruction Problem</h2>
+        <div class="abstract-glass">
+          <p>A full 4D scene representation demands a complete 3D model at every moment in time. In real-world data, moving objects and the static background are bundled in every frame; current feed-forward reconstructors process this bundle as-is, producing <strong>ghosting artefacts and incomplete geometry</strong>.</p>
+          <p>We introduce <strong>StaDy4D</strong>, the first large-scale paired static-dynamic 4D dataset, and <strong>SIGMA</strong>, a streaming pipeline that explicitly isolates moving regions, restores occluded backgrounds, and reconstructs clean static geometry &mdash; compatible with any off-the-shelf reconstructor.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== METHOD OVERVIEW ============== -->
+    <section class="reveal" id="method">
+      <div class="content-width">
+        <div class="section-eyebrow">02 / Method</div>
+        <h2 class="grad-h2">SIGMA Pipeline</h2>
+        <p class="lede">Three autoregressive stages. Click each to focus.</p>
+
+        <div class="overview-pipeline glass" id="pipelineRow">
+          <div class="overview-item">
+            <div class="overview-video-box">
+              <video autoplay muted loop playsinline><source src="./assets/data/dynamic_rgb.mp4" type="video/mp4"></video>
+            </div>
+            <div class="overview-label">Dynamic Input</div>
+          </div>
+          <div class="overview-arrow">→</div>
+          <button class="overview-box stage-1" data-stage="1"><div class="stage-num">STAGE 1</div><div class="stage-text">Open-Vocab<br>Segmentation</div><div class="stage-tech">DINO + SAM 2</div></button>
+          <div class="overview-arrow">→</div>
+          <button class="overview-box stage-2" data-stage="2"><div class="stage-num">STAGE 2</div><div class="stage-text">Occlusion-Aware<br>Inpainting</div><div class="stage-tech">SDXL + IP-Adapter</div></button>
+          <div class="overview-arrow">→</div>
+          <button class="overview-box stage-3" data-stage="3"><div class="stage-num">STAGE 3</div><div class="stage-text">Sliding-Window<br>Reconstruction</div><div class="stage-tech">Pi3 / VGGT + Sim(3)</div></button>
+          <div class="overview-arrow">→</div>
+          <div class="overview-item">
+            <div class="overview-video-box">
+              <img src="./assets/data/static_3d.gif" alt="4D Reconstruction">
+            </div>
+            <div class="overview-label">Clean (3.5+Δ)D</div>
+          </div>
+        </div>
+
+        <div class="method-grid">
+          <div class="method-card tilt" data-card="1">
+            <div class="method-step">STAGE 1</div>
+            <h3>Open-Vocabulary Dynamic Segmentation</h3>
+            <p>For each frame \(\mathbf{I}_t\), <strong>Grounding DINO</strong> localises candidate dynamic objects from a text prompt; <strong>SAM 2</strong> turns each box into a pixel-level mask. Per-frame dynamic mask <span style="white-space: nowrap;">\(\mathbf{M}_t = \bigvee_{j} \mathbf{m}_j\)</span> handles arbitrary categories without task-specific training.</p>
+          </div>
+          <div class="method-card tilt" data-card="2">
+            <div class="method-step">STAGE 2</div>
+            <h3>Occlusion-Aware Background Inpainting</h3>
+            <p><strong>SDXL</strong> with an <strong>IP-Adapter</strong> conditioned on \(\mathbf{I}_t\), \(\mathbf{M}_t\), and the previous inpainted frame \(\hat{\mathbf{I}}_{t-1}\) as a style reference. The IP-Adapter promotes temporally consistent infilling by transferring appearance from the cleaned previous frame.</p>
+          </div>
+          <div class="method-card tilt" data-card="3">
+            <div class="method-step">STAGE 3</div>
+            <h3>Sliding-Window Reconstruction</h3>
+            <p>Feed-forward \(\Phi\) (Pi3 / VGGT) over \(W\) most recent inpainted frames. Global scale recovered via Umeyama <strong>Sim(3)</strong> chaining on overlapping windows &mdash; reducing complexity from \(O(T^2)\) to \(O(T)\) for arbitrarily long sequences.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== STADY4D HERO BLOCK ============== -->
+    <section class="reveal dataset-hero" id="dataset">
+      <div class="content-width">
+        <div class="section-eyebrow">03 / Dataset</div>
+        <h2 class="grad-h2 mega">Meet <span class="brand-stady">StaDy4D</span></h2>
+        <p class="lede center">The first paired <strong class="static-tone">Static</strong>–<strong class="dynamic-tone">Dynamic</strong> 4D benchmark. Every scripted trajectory is replayed twice under <em>pixel-identical</em> camera poses, weather, and lighting.</p>
+
+        <div class="twin-showcase">
+          <div class="twin-box twin-static tilt">
+            <div class="twin-tag tag-static"><span class="dot"></span> STATIC TWIN</div>
+            <video autoplay muted loop playsinline><source src="./assets/data/static_rgb.mp4" type="video/mp4"></video>
+            <div class="twin-meta">
+              <span><i class="fas fa-cube"></i> Clean reference</span>
+              <span><i class="fas fa-bullseye"></i> Identical pose</span>
+            </div>
+          </div>
+          <div class="twin-vs">VS</div>
+          <div class="twin-box twin-dynamic tilt">
+            <div class="twin-tag tag-dynamic"><span class="dot"></span> DYNAMIC TWIN</div>
+            <video autoplay muted loop playsinline><source src="./assets/data/dynamic_rgb.mp4" type="video/mp4"></video>
+            <div class="twin-meta">
+              <span><i class="fas fa-car-side"></i> Up to 80 vehicles</span>
+              <span><i class="fas fa-walking"></i> Up to 50 pedestrians</span>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="sub-h3">Per-Frame Modalities</h3>
+        <div class="modality-strip">
+          <div class="mod-card"><div class="mod-icon"><i class="fas fa-image"></i></div><div class="mod-name">RGB</div><video autoplay muted loop playsinline><source src="./assets/data/dynamic_rgb.mp4" type="video/mp4"></video></div>
+          <div class="mod-card"><div class="mod-icon"><i class="fas fa-ruler"></i></div><div class="mod-name">Metric Depth</div><video autoplay muted loop playsinline><source src="./assets/data/dynamic_depth.mp4" type="video/mp4"></video></div>
+          <div class="mod-card"><div class="mod-icon"><i class="fas fa-cube"></i></div><div class="mod-name">3D Point Cloud</div><img src="./assets/data/dynamic_3d.gif" alt="dyn 3d"></div>
+          <div class="mod-card"><div class="mod-icon"><i class="fas fa-vector-square"></i></div><div class="mod-name">Actor Tracks</div><img src="./assets/teaser/teaser.gif" alt="tracks"></div>
+        </div>
+        <p class="caption">RGB · 0–1000 m metric depth · camera-to-world poses · per-frame 3D bounding boxes &amp; trajectories &middot; 640×480 &middot; 70° HFoV</p>
+
+        <h3 class="sub-h3">Multi-Camera 3D World</h3>
+        <p class="lede center">All 9 cameras of a single scenario live in one shared world. The unprojected per-camera point clouds align via ground-truth extrinsics — the side stack shows what each camera sees.</p>
+        <div class="world-view">
+          <div class="world-view-main">
+            <canvas id="worldCanvas" data-src="./assets/world/scene_T03_002.glb" data-point-size="2"></canvas>
+            <div class="world-view-tag"><i class="fas fa-globe"></i> 3D world · 9-camera fusion · drag to orbit</div>
+          </div>
+          <div class="world-view-cams">
+            <div class="world-cam">
+              <span class="world-cam-tag"><i class="fas fa-car"></i> Dashcam</span>
+              <img src="./assets/data_demo/Town03_00_cam00_car_forward_static.gif" alt="dashcam view" loading="lazy">
+            </div>
+            <div class="world-cam">
+              <span class="world-cam-tag"><i class="fas fa-helicopter"></i> Drone</span>
+              <img src="./assets/data_demo/Town03_00_cam01_drone_forward_static.gif" alt="drone view" loading="lazy">
+            </div>
+            <div class="world-cam">
+              <span class="world-cam-tag"><i class="fas fa-video"></i> CCTV</span>
+              <img src="./assets/data_demo/Town03_00_cam04_cctv_static.gif" alt="cctv view" loading="lazy">
+            </div>
+          </div>
+        </div>
+        <h3 class="sub-h3">Why StaDy4D</h3>
+        <div class="facts-grid">
+          <div class="fact-card tilt"><div class="fact-icon"><i class="fas fa-clone"></i></div><div class="fact-title">Paired Replays</div><div class="fact-desc">A deterministic simulator replays each scripted scenario twice — once with movers, once without — giving pixel-aligned twin sequences.</div></div>
+          <div class="fact-card tilt"><div class="fact-icon"><i class="fas fa-camera"></i></div><div class="fact-title">9 Camera Configs</div><div class="fact-desc">Dashcam, drone, building observer, intersection observer, CCTV, pedestrian — narrow, wide, and static baselines.</div></div>
+          <div class="fact-card tilt"><div class="fact-icon"><i class="fas fa-cloud-sun-rain"></i></div><div class="fact-title">4 Weather Presets</div><div class="fact-desc">Clear, Hard Rain, Mid-Rain Sunset, Wet Cloudy — held identical between paired captures.</div></div>
+          <div class="fact-card tilt"><div class="fact-icon"><i class="fas fa-map"></i></div><div class="fact-title">Cross-Scene Test</div><div class="fact-desc">Train and test scenarios are geographically disjoint — entirely unseen urban layouts at evaluation.</div></div>
+          <div class="fact-card tilt"><div class="fact-icon"><i class="fas fa-stopwatch"></i></div><div class="fact-title">3 Duration Splits</div><div class="fact-desc">Short (5s/50f), Mid (10s/100f), Long (30s/300f) — per-clip, multi-view, and streaming regimes respectively.</div></div>
+          <div class="fact-card tilt"><div class="fact-icon"><i class="fas fa-microscope"></i></div><div class="fact-title">Pixel-Dense GT</div><div class="fact-desc">Noiseless metric depth (0–1000 m, 1 cm precision) and per-frame 3D bounding boxes for every actor.</div></div>
+        </div>
+
+        <h3 class="sub-h3">Comparison with Existing Datasets</h3>
+        <div class="table-wrap">
+          <table class="fancy-table">
+            <thead>
+              <tr><th>Dataset</th><th>S/D Pair</th><th>Dense Depth</th><th>Multi-View</th><th>Viewpoint Div.</th><th>Object Tracks</th><th>#Videos</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>KITTI</td><td>—</td><td>—</td><td>✓</td><td>—</td><td>✓</td><td>61</td></tr>
+              <tr><td>nuScenes</td><td>—</td><td>—</td><td>✓</td><td>✓</td><td>✓</td><td>1K</td></tr>
+              <tr><td>Waymo</td><td>—</td><td>—</td><td>✓</td><td>—</td><td>✓</td><td>1.15K</td></tr>
+              <tr><td>Virtual KITTI</td><td>✓</td><td>✓</td><td>✓</td><td>—</td><td>✓</td><td>50</td></tr>
+              <tr><td>CARLA</td><td>—</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>N/A</td></tr>
+              <tr><td>SEED4D</td><td>—</td><td>✓</td><td>✓</td><td>—</td><td>—</td><td>12K</td></tr>
+              <tr><td>LightCity</td><td>—</td><td>✓</td><td>✓</td><td>—</td><td>—</td><td>&gt;50K imgs</td></tr>
+              <tr class="ours-row"><td><strong>StaDy4D (Ours)</strong></td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><strong>18K</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== INTERACTIVE GALLERY ============== -->
+    <section class="reveal" id="explore">
+      <div class="content-width">
+        <div class="section-eyebrow">04 / Explore</div>
+        <h2 class="grad-h2">Interactive Dataset Browser</h2>
+        <p class="lede center">Pick a scenario &amp; camera archetype. Sliders auto-sweep — drag to take control, or click a tile to expand.</p>
+
+        <div class="gallery-town-tabs" id="town-tabs">
+          <button class="gallery-town-tab active" data-town="Town01">Scenario 01<span class="train-pill">train</span></button>
+          <button class="gallery-town-tab" data-town="Town02">Scenario 02<span class="train-pill">train</span></button>
+          <button class="gallery-town-tab" data-town="Town03">Scenario 03<span class="test-pill">test</span></button>
+          <button class="gallery-town-tab" data-town="Town04">Scenario 04<span class="train-pill">train</span></button>
+          <button class="gallery-town-tab" data-town="Town05">Scenario 05<span class="train-pill">train</span></button>
+          <button class="gallery-town-tab" data-town="Town06">Scenario 06<span class="train-pill">train</span></button>
+          <button class="gallery-town-tab" data-town="Town07">Scenario 07<span class="test-pill">test</span></button>
+          <button class="gallery-town-tab" data-town="Town10HD">Scenario 08<span class="test-pill">test</span></button>
+        </div>
+
+        <div class="gallery-container">
+          <div class="gallery-camera-tabs" id="camera-tabs">
+            <button class="gallery-camera-tab active" data-camera="car_forward"><i class="fas fa-car"></i><span>Dashcam</span></button>
+            <button class="gallery-camera-tab" data-camera="drone_forward"><i class="fas fa-helicopter"></i><span>Drone</span></button>
+            <button class="gallery-camera-tab" data-camera="orbit_building"><i class="fas fa-building"></i><span>Building</span></button>
+            <button class="gallery-camera-tab" data-camera="orbit_crossroad"><i class="fas fa-road"></i><span>Intersection</span></button>
+            <button class="gallery-camera-tab" data-camera="cctv"><i class="fas fa-video"></i><span>CCTV</span></button>
+            <button class="gallery-camera-tab" data-camera="pedestrian"><i class="fas fa-walking"></i><span>Pedestrian</span></button>
+          </div>
+          <div class="gallery-content" id="gallery-content"></div>
+        </div>
+        <div class="kbd-hints">
+          <span><kbd>←</kbd> <kbd>→</kbd> switch scenarios</span>
+          <span><kbd>↑</kbd> <kbd>↓</kbd> switch cameras</span>
+          <span><kbd>T</kbd> toggle theme</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== INFINITE WALL ============== -->
+    <section class="reveal wall-section" id="scale">
+      <div class="content-width">
+        <div class="section-eyebrow">05 / Scale</div>
+        <h2 class="grad-h2">Diversity at a Glance</h2>
+        <p class="lede center">A continuous wall sampled across all 8 scenarios × 6 archetypes × 2 modes. Hover to pause and zoom; click to enlarge.</p>
+      </div>
+      <div class="scroll-wall" id="scroll-wall"></div>
+    </section>
+
+    <!-- ============== RESULTS ============== -->
+    <section class="reveal" id="results">
+      <div class="content-width">
+        <div class="section-eyebrow">06 / Results</div>
+        <h2 class="grad-h2">SIGMA vs Baselines</h2>
+        <p class="lede center">Baselines (VGGT, Pi3) bake moving vehicles into the reconstruction as <span class="ghost-tone">ghost trails</span>. <strong>SIGMA</strong> removes these artefacts, recovering clean road surfaces and façades that closely match ground truth.</p>
+
+        <div class="pipeline-table-wrap">
+          <table class="pipeline-table fancy-pipeline">
+            <thead>
+              <tr><th>Original Frame</th><th>Dynamic Mask</th><th>Inpainted</th><th>SIGMA (Ours)</th><th>Ground Truth</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><img class="lightbox-img" src="assets/pipeline/dynamic_2d.gif" alt="orig"></td>
+                <td><img class="lightbox-img" src="assets/pipeline/motion_2d.gif" alt="mask"></td>
+                <td><img class="lightbox-img" src="assets/pipeline/inpaint_2d.gif" alt="inpaint"></td>
+                <td><img class="lightbox-img" src="assets/compare/ours_recon.gif" alt="ours"></td>
+                <td><img class="lightbox-img" src="assets/pipeline/gt_2d.gif" alt="gt"></td>
+              </tr>
+              <tr>
+                <td><img class="lightbox-img" src="assets/pipeline/dynamic_3d.gif" alt="orig 3d"></td>
+                <td><div class="dash-cell">—</div></td>
+                <td><img class="lightbox-img" src="assets/compare/ours_inpaint.gif" alt="inpaint 3d"></td>
+                <td><img class="lightbox-img" src="assets/pipeline/reconstruct_3d.gif" alt="ours 3d"></td>
+                <td><img class="lightbox-img" src="assets/pipeline/gt_3d.gif" alt="gt 3d"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="sub-h3">Static Reconstruction on StaDy4D (ShortVid Test Set)</h3>
+        <div class="table-wrap">
+          <table class="fancy-table">
+            <thead>
+              <tr>
+                <th rowspan="2">Method</th>
+                <th colspan="3">Pose</th>
+                <th colspan="2">Depth</th>
+                <th colspan="3">Point Cloud</th>
+              </tr>
+              <tr>
+                <th>RRA@30↑</th><th>RTA@30↑</th><th>AUC↑</th>
+                <th>Abs Rel↓</th><th>δ<sub>1.25</sub>↑</th>
+                <th>Acc.↓</th><th>Comp.↓</th><th>N.C.↑</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>VGGT</td><td><strong>100.0</strong></td><td>94.6</td><td>85.0</td><td>0.163</td><td>0.829</td><td>4.924</td><td>3.551</td><td>0.629</td></tr>
+              <tr><td>Pi3</td><td>99.9</td><td>93.6</td><td>84.7</td><td>0.157</td><td>0.867</td><td>3.885</td><td>3.342</td><td>0.495</td></tr>
+              <tr class="ours-row"><td><strong>SIGMA</strong></td><td>99.9</td><td><strong>95.6</strong></td><td><strong>88.8</strong></td><td><strong>0.090</strong></td><td><strong>0.916</strong></td><td><strong>3.007</strong></td><td><strong>2.326</strong></td><td><strong>0.777</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="sub-h3">Generalisation to Real-World Data</h3>
+        <p class="caption">TUM-dynamics (indoor + people) · DTU · ETH3D. <strong>Best in bold</strong>, <u>second best underlined</u>.</p>
+        <div class="table-wrap">
+          <table class="fancy-table">
+            <thead>
+              <tr>
+                <th rowspan="2">Method</th>
+                <th colspan="3">Pose (TUM-dynamics)</th>
+                <th colspan="3">Point Cloud (DTU)</th>
+                <th colspan="3">Point Cloud (ETH3D)</th>
+              </tr>
+              <tr>
+                <th>ATE↓</th><th>RPE<sub>t</sub>↓</th><th>RPE<sub>r</sub>↓</th>
+                <th>Acc.↓</th><th>Comp.↓</th><th>N.C.↑</th>
+                <th>Acc.↓</th><th>Comp.↓</th><th>N.C.↑</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Fast3R</td><td>0.090</td><td>0.101</td><td>1.425</td><td>3.340</td><td>2.929</td><td>0.671</td><td>3.340</td><td>0.832</td><td>0.667</td></tr>
+              <tr><td>CUT3R</td><td>0.047</td><td>0.015</td><td>0.451</td><td>4.742</td><td>3.400</td><td><u>0.679</u></td><td>0.617</td><td>0.747</td><td>0.754</td></tr>
+              <tr><td>FLARE</td><td>0.026</td><td>0.013</td><td>0.475</td><td>2.541</td><td>3.174</td><td><strong>0.684</strong></td><td>0.464</td><td>0.664</td><td>0.744</td></tr>
+              <tr><td>VGGT</td><td><strong>0.012</strong></td><td><u>0.010</u></td><td><u>0.311</u></td><td>1.338</td><td>1.896</td><td>0.676</td><td>0.280</td><td>0.305</td><td>0.853</td></tr>
+              <tr><td>Pi3</td><td><u>0.014</u></td><td><strong>0.009</strong></td><td>0.312</td><td><u>1.198</u></td><td><u>1.849</u></td><td>0.678</td><td><strong>0.194</strong></td><td><strong>0.210</strong></td><td>0.883</td></tr>
+              <tr class="ours-row"><td><strong>SIGMA</strong></td><td>0.016</td><td>0.012</td><td><strong>0.301</strong></td><td><strong>0.836</strong></td><td><strong>0.610</strong></td><td>0.652</td><td><u>0.217</u></td><td><u>0.213</u></td><td><strong>0.893</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="sub-h3">Per-Archetype Reconstruction Accuracy</h3>
+        <div class="table-wrap">
+          <table class="fancy-table">
+            <thead><tr><th>Camera Archetype</th><th>AUC↑</th><th>Abs Rel↓</th><th>Acc.↓</th></tr></thead>
+            <tbody>
+              <tr><td><i class="fas fa-car"></i> Dashcam</td><td>83.0</td><td>0.091</td><td>4.145</td></tr>
+              <tr><td><i class="fas fa-helicopter"></i> Drone</td><td>86.6</td><td>0.054</td><td>6.786</td></tr>
+              <tr><td><i class="fas fa-building"></i> Orbit (building)</td><td>98.4</td><td>0.046</td><td>1.418</td></tr>
+              <tr><td><i class="fas fa-road"></i> Orbit (intersection)</td><td>99.6</td><td>0.196</td><td>2.311</td></tr>
+              <tr><td><i class="fas fa-video"></i> CCTV</td><td>99.1</td><td>0.117</td><td>0.779</td></tr>
+              <tr><td><i class="fas fa-walking"></i> Pedestrian</td><td>77.5</td><td>0.124</td><td>3.279</td></tr>
+              <tr class="ours-row"><td><em>All (average)</em></td><td><strong>90.7</strong></td><td><strong>0.105</strong></td><td><strong>3.120</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="sub-h3">Interactive 3D Reconstruction</h3>
+        <div class="model-card">
+          <model-viewer src="./assets/reconstruct/ours_scene.glb"
+                        alt="SIGMA static reconstruction"
+                        camera-controls
+                        auto-rotate
+                        autoplay
+                        shadow-intensity="1"
+                        exposure="1.1"
+                        style="width:100%;height:560px;border-radius:18px;">
+          </model-viewer>
+          <p class="caption center">Drag to orbit · scroll to zoom · the moving vehicles have been removed before fusion.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== CITATION ============== -->
+    <section id="bibtex" class="reveal">
+      <div class="content-width">
+        <div class="section-eyebrow">07 / Cite</div>
+        <h2 class="grad-h2">Citation</h2>
+        <div class="code-block fancy-code">
+          <button class="copy-btn" onclick="copyBibtex(this)"><i class="fas fa-copy"></i> Copy</button>
+          <pre id="bib">@inproceedings{anonymous2026stady4d,
+  title     = {{$\Sigma$}StaDy4D: Towards Complete 4D Static-Dynamic Reconstruction with SIGMA},
+  author    = {Anonymous},
+  booktitle = {NeurIPS 2026 Datasets and Benchmarks (under review)},
+  year      = {2026}
+}</pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="reveal">
+      <div class="content-width text-center">
+        <h2 class="grad-h2">Contact</h2>
+        <p>Author contact withheld for double-blind review.</p>
+      </div>
+    </section>
+
+    <footer>
+      <div class="content-width">
+        <p>© 2026 Anonymous Authors</p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lightboxClose"><i class="fas fa-times"></i></button>
+    <img id="lightboxImg" src="" alt="">
+  </div>
+
+  <script src="script.js"></script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    const canvas = document.getElementById('worldCanvas');
+    if (canvas) {
+      const src = canvas.dataset.src;
+      const pointSize = parseFloat(canvas.dataset.pointSize || '4');
+
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      renderer.setPixelRatio(window.devicePixelRatio);
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 5000);
+
+      const controls = new OrbitControls(camera, canvas);
+      controls.enableDamping = true;
+      controls.autoRotate = true;
+      controls.autoRotateSpeed = 0.6;
+
+      const resize = () => {
+        const w = canvas.clientWidth, h = canvas.clientHeight;
+        if (canvas.width !== w || canvas.height !== h) {
+          renderer.setSize(w, h, false);
+          camera.aspect = w / h;
+          camera.updateProjectionMatrix();
+        }
+      };
+
+      const loader = new GLTFLoader();
+      loader.load(src, (gltf) => {
+        scene.add(gltf.scene);
+
+        // Bump point size + disable size attenuation for crisp dots
+        gltf.scene.traverse(o => {
+          if (o.isPoints && o.material) {
+            o.material.size = pointSize;
+            o.material.sizeAttenuation = false;
+            o.material.needsUpdate = true;
+          }
+        });
+
+        // Auto-fit camera to bounding box
+        const box = new THREE.Box3().setFromObject(gltf.scene);
+        const sphere = new THREE.Sphere();
+        box.getBoundingSphere(sphere);
+        const dir = new THREE.Vector3(0.6, 0.4, 0.8).normalize();
+        camera.position.copy(sphere.center).addScaledVector(dir, sphere.radius * 1.6);
+        camera.near = Math.max(0.1, sphere.radius * 0.01);
+        camera.far  = sphere.radius * 20;
+        camera.updateProjectionMatrix();
+        controls.target.copy(sphere.center);
+        controls.minDistance = sphere.radius * 0.3;
+        controls.maxDistance = sphere.radius * 6;
+        controls.update();
+      });
+
+      const tick = () => {
+        resize();
+        controls.update();
+        renderer.render(scene, camera);
+        requestAnimationFrame(tick);
+      };
+      tick();
+    }
+  </script>
+</body>
+</html>
