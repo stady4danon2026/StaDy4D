@@ -23,7 +23,7 @@ StaDy4D/
 *.png
 
 # Allow supplementary site assets
-!dataviewer/**
+!docs/**
 
 # IDE
 .vscode/
