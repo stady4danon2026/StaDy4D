@@ -177,8 +177,8 @@ document.addEventListener('DOMContentLoaded', function () {
   // ============== GALLERY ==============
   const towns = ['Town01', 'Town02', 'Town04', 'Town05', 'Town06', 'Town03', 'Town07', 'Town10HD'];
   const townDisplay = {
-    Town01: 'City Map 01', Town02: 'City Map 02', Town03: 'City Map 03', Town04: 'City Map 04',
-    Town05: 'City Map 05', Town06: 'City Map 06', Town07: 'City Map 07', Town10HD: 'City Map 10'
+    Town01: 'City Map 1', Town02: 'City Map 2', Town03: 'City Map 3', Town04: 'City Map 4',
+    Town05: 'City Map 5', Town06: 'City Map 6', Town07: 'City Map 7', Town10HD: 'City Map 8'
   };
   const scenes = ['00', '01', '02', '03', '04', '05'];
   const cameraOrder = ['car_forward', 'drone_forward', 'orbit_building', 'orbit_crossroad', 'cctv', 'pedestrian'];
